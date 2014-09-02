@@ -294,18 +294,18 @@ class libHTML
 		else
 			return $output;
 	}
-	
-	
+
+
 	public static function threadLink($postID) {
 		global $DB;
-	
+
 		$postID = (int)$postID;
-	
+
 		list($toID) = $DB->sql_row("SELECT toID FROM wD_ForumMessages WHERE id=".$postID);
-	
+
 		if( $toID == null || $toID == 0 )
 		$toID = $postID;
-	
+
 		return '<a href="forum.php?threadID='.$toID.'#'.$postID.'">'.l_t('Go to thread').'</a>';
 	}
 	static function admincpType($actionType, $id)
@@ -376,8 +376,8 @@ class libHTML
 
 		/*
 		 * This line when included in the header caused certain translated hyphenated letters to come out as black diamonds with question marks.
-		 * 
-		
+		 *
+
 		*/
 		return '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 		<html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://www.facebook.com/2008/fbml">
@@ -385,7 +385,7 @@ class libHTML
 	<meta http-equiv="content-type" content="text/html;charset=utf-8" />
 		<meta http-equiv="Content-Style-Type" content="text/css" />
 		<meta name="robots" content="index,follow" />
-		<meta name="description" content="'.l_t('webDiplomacy is an online, multiplayer, turn-based strategy game that lets you play Diplomacy online.').'" />
+		<meta name="description" content="'.l_t('Bitcoin Diplomacy combine the digital currency with the classic strategy game.').'" />
 		<meta name="keywords" content="'.l_t('diplomacy,diplomacy game,online diplomacy,classic diplomacy,web diplomacy,diplomacy board game,play diplomacy,php diplomacy').'" />
 		<link rel="shortcut icon" href="'.STATICSRV.l_s('favicon.ico').'" />
 		<link rel="icon" href="'.STATICSRV.l_s('favicon.ico').'" />
@@ -400,7 +400,7 @@ class libHTML
 		<script type="text/javascript">
 		STATICSRV="'.STATICSRV.'";
 		</script>
-		<title>'.l_t('%s - webDiplomacy',$title).'</title>
+		<title>'.l_t('%s - BitDip',$title).'</title>
 	</head>';
 	}
 
@@ -736,7 +736,7 @@ class libHTML
 			{
 				print self::footerDebugData();
 			}
-			
+
 			print self::footerScripts();
 		}
 		else
@@ -749,21 +749,21 @@ class libHTML
 
 		close();
 	}
-	
+
 	private static function footerDebugData() {
 		global $Locale, $DB;
-		
+
 		$buf = '';
 		if( is_object($DB) )
 			$buf .= $DB->profilerPrint();
-		
+
 		if( is_object($Locale) )
 		{
 			$buf .= '<br /><strong>Missed localization lookups:</strong><br />';
 			foreach($Locale->failedLookups as $failedText)
 				$buf .= htmlentities($failedText).'<br />';
 		}
-		
+
 		return $buf;
 	}
 
@@ -875,13 +875,13 @@ class libHTML
 
 	public static $footerScript=array();
 	public static $footerIncludes=array();
-	
+
 	public static function likeCount($likeCount) {
 		if($likeCount==0) return '';
 		//return ' <span class="likeCount">('.$likeCount.' like'.($likeCount>1?'s':'').')</span>';
 		return ' <span class="likeCount">(+'.$likeCount.')</span>';
 	}
-	
+
 	static private function footerScripts() {
 		global $User, $Locale;
 
@@ -922,10 +922,10 @@ class libHTML
 				libHTML::$footerScript[]=l_jf('setForumParticipatedIcons').'();';
 			}
 		}
-		
+
 		if( is_object($Locale) )
 			$Locale->onFinish();
-		
+
 		// Add the javascript includes:
 		$footerIncludes = array();
 		$footerIncludes[] = l_j('../locales/layer.js');
@@ -935,7 +935,7 @@ class libHTML
 		$footerIncludes[] = l_j('cacheUpdate.js');
 		$footerIncludes[] = l_j('timeHandler.js');
 		$footerIncludes[] = l_j('forum.js');
-		
+
 		// Don't localize all the footer includes here, as some of them may be dynamically generated
 		foreach( array_merge($footerIncludes,self::$footerIncludes) as $includeJS ) // Add on the dynamically added includes
 			$buf .= '<script type="text/javascript" src="'.STATICSRV.JSDIR.'/'.$includeJS.'"></script>';
@@ -953,25 +953,25 @@ class libHTML
 				this.token="'.md5(Config::$secret.$User->id.'Array').'";
 			}
 			User = new UserClass();
-			
+
 			WEBDIP_DEBUG='.(Config::$debug ? 'true':'false').';
 
 			document.observe("dom:loaded", function() {
-			
+
 				try {
 					'.l_jf('Locale.onLoad').'();
-					
+
 					'.l_jf('onlineUsers.push').'(User.id);
-	
+
 					'.l_jf('setUserOnlineIcons').'();
 					'.l_jf('setForumMessageIcons').'();
 					'.l_jf('setPostsItalicized').'();
 					'.l_jf('updateTimestamps').'();
 					'.l_jf('updateUTCOffset').'();
 					'.l_jf('updateTimers').'();
-	
+
 					'.implode("\n", self::$footerScript).'
-					
+
 					'.l_jf('Locale.afterLoad').'();
 				}
 				catch( e ) {
@@ -980,7 +980,7 @@ class libHTML
 			}, this);
 		</script>
 		';
-		
+
 		if( Config::$debug )
 			$buf .= '<br /><strong>JavaScript localization lookup failures:</strong><br /><span id="jsLocalizationDebug"></span>';
 
