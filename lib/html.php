@@ -842,11 +842,7 @@ class libHTML
 
 	static private function footerCopyright() {
 		// Version, sourceforge and HTML compliance logos
-		return l_t('webDiplomacy version <strong>%s</strong>',number_format(VERSION/100,2)).'<br />
-			<a href="http://sourceforge.net/projects/phpdiplomacy">
-				<img alt="webDiplomacy @ Sourceforge"
-					src="http://sourceforge.net/sflogo.php?group_id=125692" />
-			</a>';
+		return l_t('webDiplomacy version <strong>%s</strong>',number_format(VERSION/100,2)).'<br />';
 	}
 
 	/*
