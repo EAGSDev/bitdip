@@ -1,23 +1,10 @@
-Diplomacy is a popular turn based strategy game in which you battle to control Europe; to win you must be diplomatic and strategic.
- 
-webDiplomacy lets you play Diplomacy online.
+SPECIAL NOTICE: BitDip is an open source web development project in it's very early stages. Jim Bursch is the lead developer and he can be found on GitHub: https://github.com/jimbursch.
 
---- 
+What is Bitcoin?
+Bitcoin is a digital currency/money.
 
-README.txt - Installation information.
+What is Diplomacy?
+Diplomacy is a simple yet sophisticated game of grand strategy.
 
-AGPL.txt - The license webDiplomacy is distributed under.
-
----
-
-http://webdiplomacy.net/ - The official webDiplomacy server.
-
-http://forum.webdiplomacy.net/ - The official webDiplomacy developer forum.
-
-https://github.com/kestasjk/webDiplomacy - The webDiplomacy github source repository.
-
-http://sourceforge.net/projects/phpdiplomacy - The webDiplomacy Sourceforge project page.
-
----
-
-Kestas J. Kuliukas - kestas@kuliukas.com
+What is Bitcoin Diplomacy?
+Bitcoin Diplomacy is an online version of the game Diplomacy (forked from webDiplomacy.net) combined with a system of finance denominated in Bitcoin. Essentially, at BitDip you play Diplomacy for real money.
