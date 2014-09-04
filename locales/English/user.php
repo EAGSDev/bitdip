@@ -39,18 +39,6 @@ defined('IN_CODE') or die('This script can not be run by itself.');
 		?>" <?php if ( isset($_REQUEST['emailToken']) ) print 'readonly '; ?> /></li>
 	<li class="formlistdesc">Your e-mail address; this will <strong>not</strong> be spammed or given out to anyone.</li>
 
-	<li class="formlisttitle">Hide e-mail address:</li>
-	<li class="formlistfield">
-		<input type="radio" name="userForm[hideEmail]" value="Yes" <?php if($User->hideEmail=='Yes') print "checked"; ?>>Yes
-		<input type="radio" name="userForm[hideEmail]" value="No" <?php if($User->hideEmail=='No') print "checked"; ?>>No
-	</li>
-	<li class="formlistdesc">
-		Select whether or not you would like other users to be able
-		to see your e-mail address. If you choose to show your e-mail it
-		will be embedded into an image to prevent spam bots from picking it up,
-		so only humans can see it even if you choose to show it.
-	</li>
-
 	<li class="formlisttitle">Password:</li>
 	<li class="formlistfield">
 		<input type="password" name="userForm[password]" maxlength=30>
@@ -65,15 +53,6 @@ defined('IN_CODE') or die('This script can not be run by itself.');
 	</li>
 	<li class="formlistdesc">
 		Re-enter your webDiplomacy password, to make sure there are no typos.
-	</li>
-
-	<li class="formlisttitle">Home page:</li>
-	<li class="formlistfield">
-		<input type="text" size=50 name="userForm[homepage]" value="<?php print $User->homepage; ?>" maxlength=150>
-	</li>
-	<li class="formlistdesc">
-		<?php if ( !$User->type['User'] ) print '<strong>(Optional)</strong>: '; ?>
-		Your blog, personal website or favourite website.
 	</li>
 
 	<li class="formlisttitle">Comment:</li>
@@ -130,7 +109,7 @@ if( $User->type['User'] ) {
 		}
 		print '</ul></li>';
 	}
-	
+
 	$tablMutedThreads = $DB->sql_tabl(
 		"SELECT mt.muteThreadID, f.subject, f.replies, fu.username ".
 		"FROM wD_MuteThread mt ".
@@ -141,23 +120,23 @@ if( $User->type['User'] ) {
 	while( $mutedThread = $DB->tabl_hash($tablMutedThreads))
 		$mutedThreads[] = $mutedThread;
 	unset($tablMutedThreads);
-	
+
 	if( count($mutedThreads) > 0 ) {
 		print '<li class="formlisttitle"><a name="threadmutes"></a>Muted threads:</li>';
 		print '<li class="formlistdesc">The threads which you muted.</li>';
-		
+
 		$unmuteThreadID=0;
 		if( isset($_GET['unmuteThreadID']) ) {
-			
+
 			$unmuteThreadID = (int)$_GET['unmuteThreadID'];
 			$User->toggleThreadMute($unmuteThreadID);
-			
+
 			print '<li class="formlistfield"><strong>Thread <a class="light" href="forum.php?threadID='.$unmuteThreadID.'#'.$unmuteThreadID.
 				'">#'.$unmuteThreadID.'</a> unmuted.</strong></li>';
 		}
-		
+
 		print '<li class="formlistfield"><ul>';
-		
+
 		foreach ($mutedThreads as $mutedThread) {
 			if( $unmuteThreadID == $mutedThread['muteThreadID']) continue;
 			print '<li>'.

@@ -137,18 +137,6 @@ class User {
 	 */
 	public $comment;
 
-	/**
-	 * User-profile homepage
-	 * @var string
-	 */
-	public $homepage;
-
-	/**
-	 * Hide-email? 'Yes'/'No'
-	 *
-	 * @var string
-	 */
-	public $hideEmail;
 
 	/**
 	 * UNIX timestamp of join-date
@@ -312,7 +300,7 @@ class User {
 		$SQLVars = array();
 
 		$available = array('username'=>'', 'password'=>'', 'passwordcheck'=>'', 'email'=>'',
-					'hideEmail'=>'','showEmail'=>'', 'homepage'=>'','comment'=>'');
+					'showEmail'=>'','comment'=>'');
 
 		$userForm = array();
 
@@ -355,24 +343,6 @@ class User {
 			}
 		}
 
-		if( isset($userForm['hideEmail']) )
-		{
-			if ( $userForm['hideEmail'] == "Yes" )
-			{
-				$SQLVars['hideEmail'] = "Yes";
-			}
-			else
-			{
-				$SQLVars['hideEmail'] = "No";
-			}
-		}
-
-		if( isset($userForm['homepage']) AND $userForm['homepage'] )
-		{
-			$userForm['homepage'] = $DB->escape($userForm['homepage']);
-
-			$SQLVars['homepage'] = $userForm['homepage'];
-		}
 
 		if(isset($userForm['comment']) AND $userForm['comment'] )
 		{
@@ -419,8 +389,6 @@ class User {
 			u.email,
 			u.type,
 			u.comment,
-			u.homepage,
-			u.hideEmail,
 			u.timeJoined,
 			u.timeLastSessionEnded,
 			u.points,

@@ -35,52 +35,9 @@ require_once(l_r('objects/mailer.php'));
 global $Mailer;
 $Mailer = new Mailer();
 
-if(!$User->type['User'])
-{
-	libHTML::error(l_t("You can't use the user control panel, you're using a guest account."));
-}
-
 libHTML::starthtml();
 
-if ( isset($_REQUEST['optout']) )
-{
-	if ( $_REQUEST['optout'] == 'on' && !$User->type['Donator'] )
-	{
-		libHTML::notice(l_t("Opt-out"), l_t("Are you sure you want to opt-out of Plura? It helps keep this place running and on ".
-			"most modern computers is barely noticable.")."<br />
-			<form><input type='submit' class='form-submit' name='optout' value='".l_t("Opt-out")."' /></form>");
-	}
-	elseif( $_REQUEST['optout'] == l_t('Opt-out') && !$User->type['Donator'] )
-	{
-		$DB->sql_put("UPDATE wD_Users SET type = CONCAT_WS(',',type,'Donator') WHERE id = ".$User->id);
 
-		$User->type['Donator'] = true;
-
-		libHTML::notice(l_t("Opt-out"), l_t("You've opted-out of running the Plura applet. If you decide to re-enable it ".
-			"later the <a href='faq.php' class='light'>FAQ</a> has a link to do so."));
-	}
-	elseif( $_REQUEST['optout'] == 'off' && $User->type['Donator'] )
-	{
-		libHTML::notice(l_t("Opt-out"), l_t("Would you like to opt back into running the Plura Java applet?")."<br />
-			<form><input type='submit' class='form-submit' name='optout' value='".l_t('Opt-in')."' /></form>");
-	}
-	elseif( $_REQUEST['optout'] == l_t('Opt-in') && $User->type['Donator'] )
-	{
-		$types = array();
-		foreach($User->type as $type=>$isMember)
-		{
-			if ( $isMember && $type != 'Donator' ) $types[] = $type;
-		}
-		$types = implode(',',$types);
-
-		$DB->sql_put("UPDATE wD_Users SET type = '".$types."' WHERE id = ".$User->id);
-
-		$User->type['Donator'] = false;
-
-		libHTML::notice(l_t("Opt-out"), l_t("You've decided to re-add the Plura applet, thanks! By running the Plura applet you ".
-			"help keep this server running."));
-	}
-}
 
 if ( isset($_REQUEST['emailToken']))
 {
@@ -115,8 +72,7 @@ if ( isset($_REQUEST['userForm']) )
 
 		unset($errors);
 
-		$allowed = array('E-mail'=>'email','E-mail hiding'=>'hideEmail',
-				'Homepage'=>'homepage','Comment'=>'comment');
+		$allowed = array('E-mail'=>'email','Comment'=>'comment');
 
 		$set = '';
 		foreach( $allowed as $name=>$SQLName )
@@ -130,14 +86,13 @@ if ( isset($_REQUEST['userForm']) )
 					throw new Exception(l_t("The e-mail address '%s', is already in use. Please choose another.",$SQLVars['email']));
 
 				$Mailer->Send(array($SQLVars['email']=>$User->username), l_t('Changing your e-mail address'),
-l_t("Hello %s",$User->username).",<br><br>
+				l_t("Hello %s",$User->username).",<br><br>
 
-".l_t("You can use this link to change your account's e-mail address to this one:")."<br>
-".libAuth::email_validateURL($SQLVars['email'])."<br><br>
+				".l_t("You can use this link to change your account's e-mail address to this one:")."<br>
+				".libAuth::email_validateURL($SQLVars['email'])."<br><br>
 
-".l_t("If you have any further problems contact the server's admin at %s.",Config::$adminEMail)."<br>
-".l_t("Regards,<br>The webDiplomacy Gamemaster")."<br>
-");
+				".l_t("If you have any further problems contact the server's admin at %s.",Config::$adminEMail)."<br>
+				".l_t("Regards,<br>The webDiplomacy Gamemaster")."<br>");
 
 				$formOutput .= l_t('A validation e-mail was sent to the new address, containing a link which will confirm '.
 					'the e-mail change. If you don\'t see it after a few minutes check your spam folder.');
@@ -189,7 +144,7 @@ l_t("Hello %s",$User->username).",<br><br>
 }
 
 
-print libHTML::pageTitle(l_t('User account settings'),l_t('Alter the settings for your webDiplomacy user account; e.g. change your password/e-mail.'));
+print libHTML::pageTitle(l_t('User account settings'),l_t('Alter the settings for your BitDip user account; e.g. change your password/e-mail.'));
 
 print '<form method="post">
 <ul class="formlist">';

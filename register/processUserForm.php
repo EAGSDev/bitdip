@@ -35,10 +35,9 @@ try
 
 	$set = '';
 
-	$required = array('Username' => 'username', 'E-mail' => 'email',
-					'E-mail hiding' => 'hideEmail');
+	$required = array('Username' => 'username', 'E-mail' => 'email');
 
-	$allowed = array('Homepage'=>'homepage','Comment'=>'comment');
+	$allowed = array('Comment'=>'comment');
 
 	foreach( $required as $name=>$SQLName )
 	{

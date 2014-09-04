@@ -406,8 +406,8 @@ list($posts) = $DB->sql_row(
 		)"); // Doing the query this way makes MySQL use the type, fromUserID index
 if( is_null($posts) ) $posts=0;
 list($likes) = $DB->sql_row("SELECT COUNT(*) FROM wD_LikePost WHERE userID=".$UserProfile->id);
-list($liked) = $DB->sql_row("SELECT COUNT(*) FROM wD_ForumMessages fm 
-	INNER JOIN wD_LikePost lp ON lp.likeMessageID = fm.id 
+list($liked) = $DB->sql_row("SELECT COUNT(*) FROM wD_ForumMessages fm
+	INNER JOIN wD_LikePost lp ON lp.likeMessageID = fm.id
 	WHERE fm.fromUserID=".$UserProfile->id);
 $likes = ($likes ? '<strong>'.l_t('Likes:').'</strong> '.$likes : '');
 $liked = ($liked ? '<strong>'.l_t('Liked:').'</strong> '.$liked : '');
@@ -422,43 +422,6 @@ unset($likes,$liked);
 print '<li>&nbsp;</li>';
 print '<li><strong>'.l_t('Joined:').'</strong> '.$UserProfile->timeJoinedtxt().'</li>';
 print '<li><strong>'.l_t('User ID#:').'</strong> '.$UserProfile->id.'</li>';
-if( $User->type['Moderator'] )
-{
-	print '<li><strong>'.l_t('E-mail:').'</strong>
-			'.$UserProfile->email.($UserProfile->hideEmail == 'No' ? '' : ' <em>'.l_t('(hidden for non-mods)').'</em>').'
-		</li>';
-}
-elseif ( $UserProfile->hideEmail == 'No' )
-{
-	$emailCacheFilename = libCache::dirID('users',$UserProfile->id).'/email.png';
-	if( !file_exists($emailCacheFilename) )
-	{
-		$image = imagecreate( strlen($UserProfile->email) *8, 15);
-		$white = imagecolorallocate( $image, 255, 255, 255);
-		$black = imagecolorallocate( $image, 0, 0, 0 );
-
-		imagestring( $image, 2, 10, 1, $UserProfile->email, $black );
-
-		imagepng($image, $emailCacheFilename);
-	}
-
-	print '<li><strong>'.l_t('E-mail:').'</strong>
-			<img src="'.STATICSRV.$emailCacheFilename.'" alt="'.l_t('[E-mail address image]').'" title="'.l_t('To protect e-mails from spambots they are embedded in an image').'" >
-		</li>';
-}
-
-if ( $UserProfile->hideEmail != 'No' )
-{
-	$emailCacheFilename = libCache::dirID('users',$UserProfile->id).'/email.png';
-
-	if( file_exists($emailCacheFilename) )
-		unlink($emailCacheFilename);
-}
-
-if ( $UserProfile->homepage )
-{
-	print '<li><strong>'.l_t('Home page:').'</strong> '.$UserProfile->homepage.'</li>';
-}
 
 print '<li>&nbsp;</li>';
 
@@ -482,7 +445,7 @@ if ( $User->type['Moderator'] && $User->id != $UserProfile->id )
 
 	if( !$UserProfile->type['Admin'] && ( $User->type['Admin'] || !$UserProfile->type['Moderator'] ) )
 		$modActions[] = libHTML::admincp('banUser',array('userID'=>$UserProfile->id), l_t('Ban user'));
-	
+
 	if( !$UserProfile->type['Donator'])
 		$modActions[] = libHTML::admincp('makeDonator',array('userID'=>$UserProfile->id), l_t('Give donator benefits'));
 
@@ -491,13 +454,13 @@ if ( $User->type['Moderator'] && $User->id != $UserProfile->id )
 
 	if( $User->type['Admin'] && ($UserProfile->type['Moderator'] && !$UserProfile->type['Admin']) )
 		$modActions[] = libHTML::admincp('takeModerator',array('userID'=>$UserProfile->id), l_t('Remove moderator'));
-	
+
 	if( $User->type['Admin'] && $UserProfile->type['ForumModerator'] )
 		$modActions[] = libHTML::admincp('giveForumModerator',array('userID'=>$UserProfile->id), l_t('Make forum moderator'));
-	
+
 	if( $User->type['Admin'] && ($UserProfile->type['ForumModerator'] && !$UserProfile->type['Admin']) )
 		$modActions[] = libHTML::admincp('takeForumModerator',array('userID'=>$UserProfile->id), l_t('Remove forum moderator'));
-	
+
 	$modActions[] = libHTML::admincp('reportMuteToggle',array('userID'=>$UserProfile->id), l_t(($UserProfile->muteReports=='No'?'Mute':'Unmute').' mod reports'));
 
 	$modActions[] = '<a href="admincp.php?tab=Multi-accounts&aUserID='.$UserProfile->id.'" class="light">'.
@@ -510,15 +473,15 @@ if ( $User->type['Moderator'] && $User->id != $UserProfile->id )
 		print implode(' - ', $modActions);
 		print '</p>';
 	}
-	
-	
-	if( !$UserProfile->type['Admin'] 
+
+
+	if( !$UserProfile->type['Admin']
 		&& ( $User->type['Admin'] || $User->type['ForumModerator'] ) )
 	{
 		$silences = $UserProfile->getSilences();
-		
+
 		print '<p><ul class="formlist"><li><strong>'.l_t('Silences:').'</strong></li><li>';
-		
+
 		if( count($silences) == 0 )
 			print l_t('No silences against this user.').'</p>';
 		else
@@ -531,7 +494,7 @@ if ( $User->type['Moderator'] && $User->id != $UserProfile->id )
 			}
 			print '</ul>';
 		}
-		
+
 		print '</li><li>';
 		print libHTML::admincp('createUserSilence',array('userID'=>$UserProfile->id,'reason'=>''),l_t('Silence user'));
 		print '</li></ul></p>';
