@@ -83,10 +83,10 @@ if ( isset($_COOKIE['imageToken']) && isset($_REQUEST['imageText']) && isset($_R
 				"play, and it will not be spammed or released."));
 
 		// Prelim checks look okay, lets send the e-mail
-		$Mailer->Send(array($email=>$email), l_t('Your new webDiplomacy account'),
+		$Mailer->Send(array($email=>$email), l_t('Your new BitDip account'),
 l_t("Hello and welcome!")."<br><br>
 
-".l_t("Thanks for validating your e-mail address; just use this link to create your new webDiplomacy account:")."<br>
+".l_t("Thanks for validating your e-mail address; just use this link to create your new BitDip account:")."<br>
 ".libAuth::email_validateURL($email)."<br><br>
 
 ".l_t("If you have any further problems contact the server's admin at %s.",Config::$adminEMail)."<br><br>
@@ -148,24 +148,22 @@ switch($page)
 {
 	case 'firstValidationForm':
 	case 'validationForm':
-		print libHTML::pageTitle(l_t('Register a webDiplomacy account'),l_t('<strong>Validate your e-mail address</strong> -&gt; Enter your account settings -&gt; Play webDiplomacy!'));
+		print libHTML::pageTitle(l_t('Register a BitDip account'),l_t('<strong>Validate your e-mail address</strong> -&gt; Enter your account settings -&gt; Play BitDip!'));
 		break;
 
 	case 'emailSent':
 	case 'emailTokenFailed':
 	case 'firstUserForm':
 	case 'userForm':
-		print libHTML::pageTitle(l_t('Register a webDiplomacy account'),l_t('Validate your e-mail address -&gt; <strong>Enter your account settings</strong> -&gt; Play webDiplomacy!'));
+		print libHTML::pageTitle(l_t('Register a BitDip account'),l_t('Validate your e-mail address -&gt; <strong>Enter your account settings</strong> -&gt; Play BitDip!'));
 }
 
 switch($page)
 {
 	case 'firstValidationForm':
 
-		print '<h2>'.l_t('Welcome to webDiplomacy!').'</h2>';
-		print '<p>'.l_t('So that we can all enjoy fun, fair games we need to quickly double check that '.
-				'you\'re a human and that you have an e-mail address. It only takes a moment '.
-				'and it keeps the server free of spam and cheaters! :-)').'</p>';
+		print '<h2>'.l_t('Welcome to Bitcoin Diplomacy!').'</h2>';
+		print '<p>'.l_t('In order to join BitDip you must have a valid invitation code from a current member. If you don\'t know an existing member, try finding one at <a href="http://webdiplomacy.net">webDiplomacy.net</a> or contact jimbursch at bitdip.net.').'</p>';
 
 	case 'validationForm':
 
