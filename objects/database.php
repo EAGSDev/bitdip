@@ -16,12 +16,6 @@
 
     You should have received a copy of the GNU Affero General Public License
     along with webDiplomacy.  If not, see <http://www.gnu.org/licenses/>.
-
-###
-jimbursch -- a mysqli framework has been added to this file, class Databasei,
-
-
-
  */
 
 defined('IN_CODE') or die('This script can not be run by itself.');

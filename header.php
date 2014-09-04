@@ -169,11 +169,6 @@ date_default_timezone_set('UTC');
 // Create database object
 require_once(l_r('objects/database.php'));
 $DB = new Database();
-// jimbursch - the following is for the MySQLi framework
-$charset='';
-$errormsg='';
-$DBi = new Databasei(DB_NAME, DB_HOST, DB_USER, DB_PASSWORD, $charset, DB_DEBUG, $errormsg);
-
 
 // Set up the misc values object
 require_once(l_r('objects/misc.php'));
