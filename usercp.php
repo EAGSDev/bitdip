@@ -25,6 +25,12 @@
 
 require_once('header.php');
 
+if (!isset($_SESSION['authorized']) || $_SESSION['authorized'] != 1) {
+	// $_SESSION['authorized'] is set in auth.php
+	libHTML::error(l_t('You must <a href="./logon.php?logoff=on">sign in</a> to your account to access account settings.'));
+}
+
+
 require_once(l_r('objects/mailer.php'));
 global $Mailer;
 $Mailer = new Mailer();

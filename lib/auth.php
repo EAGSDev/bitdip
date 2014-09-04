@@ -161,16 +161,19 @@ class libAuth
 		}
 		else
 		{
-			if(isset($_REQUEST['loginuser']) AND isset($_REQUEST['loginpass']))
+			if(isset($_REQUEST['loginuser']) AND isset($_REQUEST['loginpass'])) {
 				$key = self::userPass_Key($_REQUEST['loginuser'], $_REQUEST['loginpass'], isset($_REQUEST['loginsession']));
+				$_SESSION['authorized']=0; // Indicates authorization attempt by login, not cookie.
+				}
 			elseif(isset($_COOKIE['wD-Key']) and $_COOKIE['wD-Key'])
 				$key = $_COOKIE['wD-Key'];
 			else
 				$key = false;
 
-			if ( $key )
+			if ( $key ) {
 				$User = self::key_User($key);
-				$_SESSION['authorized']=1; // Indicates authorized by successful login, not just cookie.
+				if (isset($_SESSION['authorized'])) {$_SESSION['authorized']=1;} // Indicates authorized by successful login, not just cookie.
+				}
 			else
 				$User = new User(GUESTID);
 		}
