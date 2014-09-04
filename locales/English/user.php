@@ -44,15 +44,7 @@ defined('IN_CODE') or die('This script can not be run by itself.');
 		<input type="password" name="userForm[password]" maxlength=30>
 	</li>
 	<li class="formlistdesc">
-		Your webDiplomacy password.
-	</li>
-
-	<li class="formlisttitle">Password again:</li>
-	<li class="formlistfield">
-		<input type="password" name="userForm[passwordcheck]" maxlength=30>
-	</li>
-	<li class="formlistdesc">
-		Re-enter your webDiplomacy password, to make sure there are no typos.
+		Your BitDip password.
 	</li>
 
 	<li class="formlisttitle">Comment:</li>

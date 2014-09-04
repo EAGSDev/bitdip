@@ -299,8 +299,7 @@ class User {
 
 		$SQLVars = array();
 
-		$available = array('username'=>'', 'password'=>'', 'passwordcheck'=>'', 'email'=>'',
-					'showEmail'=>'','comment'=>'');
+		$available = array('username'=>'', 'password'=>'', 'email'=>'','comment'=>'');
 
 		$userForm = array();
 
@@ -319,15 +318,7 @@ class User {
 
 		if( isset($userForm['password']) and $userForm['password'] )
 		{
-			if ( isset($userForm['passwordcheck'])
-				and $userForm['password'] == $userForm['passwordcheck'] )
-			{
-				$SQLVars['password'] = "UNHEX('".libAuth::pass_Hash($userForm['password'])."')";
-			}
-			else
-			{
-				$errors[] = l_t("The two passwords do not match");
-			}
+			$SQLVars['password'] = "UNHEX('".libAuth::pass_Hash($userForm['password'])."')";
 		}
 
 		if(isset($userForm['email']) and $userForm['email'] )
