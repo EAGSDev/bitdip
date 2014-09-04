@@ -43,11 +43,11 @@ class User {
 		libCache::wipeDir($dir, $glob);
 		file_put_contents($dir.'/index.html', '');
 	}
-	
+
 	public function getSilences() {
 		global $DB;
-		
-		$tabl = $DB->sql_tabl("SELECT 
+
+		$tabl = $DB->sql_tabl("SELECT
 			silence.id as silenceID,
 			silence.userID as silenceUserID,
 			silence.postID as silencePostID,
@@ -59,22 +59,22 @@ class User {
 		FROM wD_Silences silence
 		WHERE silence.userID = ".$this->id."
 		ORDER BY silence.startTime DESC");
-		
+
 		$silences = array();
 		while( $record = $DB->tabl_hash($tabl) )
 			$silences[] = new Silence($record);
-		
+
 		return $silences;
 	}
-	
+
 	private $ActiveSilence;
-	
+
 	public function isSilenced() {
-		if( !$this->silenceID ) 
+		if( !$this->silenceID )
 			return false;
-		
+
 		$ActiveSilence = new Silence($this->silenceID);
-		
+
 		if( $ActiveSilence->isEnabled() ) {
 			$this->ActiveSilence = $ActiveSilence;
 			return true;
@@ -83,18 +83,18 @@ class User {
 			return false;
 	}
 	public function getActiveSilence() {
-		
+
 		if( !$this->isSilenced() ) return null;
 		else return $this->ActiveSilence;
-		
+
 	}
-	
+
 	/**
 	* Silence ID; the ID of the last silence set to this user (may be expired / disabled since)
 	* @var int/null
 	*/
 	public $silenceID;
-	
+
 	/**
 	 * User ID
 	 * @var int
@@ -612,7 +612,7 @@ class User {
 		else
 			session_cache_limiter('public');*/
 
-		session_start();
+		//session_start(); moved to header.php
 
 		// Non-users can't get banned
 		if( $this->type['Guest'] ) return;
@@ -825,7 +825,7 @@ class User {
 		if( isset($muteCountries[$gameID]) ) return $muteCountries[$gameID];
 
 		$muteCountries[$gameID] = array();
-		$tabl = $DB->sql_tabl("SELECT m.gameID, m.muteCountryID 
+		$tabl = $DB->sql_tabl("SELECT m.gameID, m.muteCountryID
 			FROM wD_MuteCountry m INNER JOIN wD_Games g ON g.id = m.gameID
 			WHERE m.userID=".$this->id.($gameID>0?" AND m.gameID=".$gameID:''));
 
@@ -854,9 +854,9 @@ class User {
 		return $likeMessages;
 	}
 	public function likeMessageToggleLink($messageID, $fromUserID=-1) {
-		
+
 		if( $this->type['User'] && $this->id != $fromUserID && !in_array($messageID, $this->getLikeMessages()))
-			return '<a id="likeMessageToggleLink'.$messageID.'" 
+			return '<a id="likeMessageToggleLink'.$messageID.'"
 			href="#" title="'.l_t('Give a mark of approval for this post').'" class="light likeMessageToggleLink" '.
 			'onclick="likeMessageToggle('.$this->id.','.$messageID.',\''.libAuth::likeToggleToken($this->id, $messageID).'\'); '.
 			'return false;">'.
@@ -877,18 +877,18 @@ class User {
 
 		return $muteThreads;
 	}
-	
+
 	public function isThreadMuted($threadID) {
 		return in_array($threadID,$this->getMuteThreads($threadID));
 	}
 	public function toggleThreadMute($threadID) {
 		global $DB;
-		
-		if( $this->isThreadMuted($threadID)) 
+
+		if( $this->isThreadMuted($threadID))
 			$DB->sql_put("DELETE FROM wD_MuteThread WHERE userID = ".$this->id." AND muteThreadID=".$threadID);
 		else
 			$DB->sql_put("INSERT INTO wD_MuteThread (userID, muteThreadID) VALUES (".$this->id.", ".$threadID.")");
-	
+
 		$this->getMuteThreads(true);
 	}
 	public function isCountryMuted($gameID, $muteCountryID) {

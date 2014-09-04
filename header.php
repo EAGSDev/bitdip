@@ -39,6 +39,9 @@ echo ( '<a href="'.$_SERVER['PHP_SELF'].'">View Again</a><br />' );
 
 die();*/
 
+
+session_start();
+
 if( strpos($_SERVER['PHP_SELF'], 'header.php') )
 {
 	die("You can't view this document by itself.");
