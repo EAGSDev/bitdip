@@ -33,7 +33,7 @@ defined('IN_CODE') or die('This script can not be run by itself.');
 		$result=$DBi->fetch_rows("$query", false, array($User->id));
 		if ($result) {
 		foreach ($result as $row) {
-			echo $row['InviteCode'].'<br />';
+			echo '<div style="margin-left:50px;">'.$row['InviteCode'].'</div>';
 		}// end foreach
 		}// end if $result
 		else {
