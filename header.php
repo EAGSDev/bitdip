@@ -163,6 +163,7 @@ $Locale->initialize();
 require_once(l_r('objects/silence.php'));
 require_once(l_r('objects/user.php'));
 require_once(l_r('objects/game.php'));
+require_once(l_r('objects/bitdip.php'));
 
 require_once(l_r('global/error.php'));
 // Set up the error handler
