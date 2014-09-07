@@ -20,20 +20,22 @@
 
 defined('IN_CODE') or die('This script can not be run by itself.');
 
-?><h2>Anti-bot Validation</h2>
+?><h2>Registration</h2>
 
 <form method="post" action="register.php">
 
 	<ul class="formlist">
 
-		<li class="formlisttitle">Anti-script code</li>
+		<?php if (isset($_REQUEST['InviteCode'])) {$invitecode=$_REQUEST['InviteCode'];} else {$invitecode='';} ?>
+
+		<li class="formlisttitle">Invitation Code</li>
 		<li class="formlistfield">
-		        <img alt="EasyCaptcha image" src="<?php print STATICSRV; ?>contrib/easycaptcha.php" /><br />
-		        <input type="text" name="imageText" />
+		        <input type="text" name="InviteCode" value="<?php echo $invitecode; ?>" />
 		</li>
 		<li class="formlistdesc">
-			By entering the above code you protect our forum from spam-bots and other scripts
+			Enter your invitation code.
 		</li>
+
 
 		<li class="formlisttitle">E-mail address</li>
 		<li class="formlistfield"><input type="text" name="emailValidate" size="50" value="<?php
@@ -41,8 +43,7 @@ defined('IN_CODE') or die('This script can not be run by itself.');
 					print $_REQUEST['emailValidate'];
 		        ?>"></li>
 		<li class="formlistdesc">
-			By making sure every user has a real e-mail address we stop cheaters from creating many users for themselves.
-			This will <strong>not</strong> be spammed or released, it is only used to validate you
+		Your email address will never be shared with anyone.
 		</li>
 </ul>
 
