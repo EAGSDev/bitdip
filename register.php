@@ -52,7 +52,7 @@ if (isset($_REQUEST['emailValidate']) && isset($_REQUEST['InviteCode']) )
 {
 	try
 	{
-		// check the invite code
+
 
 
 
@@ -78,7 +78,7 @@ if (isset($_REQUEST['emailValidate']) && isset($_REQUEST['InviteCode']) )
 			$regid = $DBi->insert_id;
 		}// end else
 
-
+		// check the invite code
 		$invitecode=trim($_REQUEST['InviteCode']);
 		$query="SELECT UserID, InviteCode FROM bd_invitecodes WHERE InviteCode=?";
 		$row=$DBi->fetch_row("$query", false, array($invitecode));
@@ -91,6 +91,10 @@ if (isset($_REQUEST['emailValidate']) && isset($_REQUEST['InviteCode']) )
 			$source=$row['UserID'];
 			$query="UPDATE bd_registrations SET Source=?";
 			$result=$DBi->query("$query",array($source));
+			$bitdip= new BitDip();
+			$newinvitecode=$bitdip->generateinvitecode();
+			$query="UPDATE bd_invitecodes SET InviteCode=? WHERE InviteCode=?";
+			$result=$DBi->query("$query",array($newinvitecode,$invitecode));
 		}
 
 
