@@ -35,9 +35,10 @@ class BitDip
 		global $DBi;
 		$result='TRUE';
 		while ($result) {
-			$newinvitecode = substr(hash('sha256',time().session_id()), 3, 16);
+			$newinvitecode = substr(hash('sha256',time().session_id()), 3, 8);
+			// make sure invitecode is unique
 			$query="SELECT InviteCode FROM bd_invitecodes WHERE InviteCode=?";
-			$result=$db->fetch_row("$query",false,array($newinvitecode));
+			$result=$DBi->fetch_row("$query",false,array($newinvitecode));
 		}// end while
 		return $newinvitecode;
 	}// end function
