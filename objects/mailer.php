@@ -88,7 +88,7 @@ class Mailer
 			return;
 		}
 
-		$title = l_t('webDiplomacy: %s (no reply)',$title);
+		$title = l_t('BitDip: %s (no reply)',$title);
 		$this->PHPMailer->Subject = $title;
 
 
