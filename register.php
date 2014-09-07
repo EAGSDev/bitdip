@@ -48,52 +48,64 @@ libHTML::starthtml();
 
 $page = 'firstValidationForm';
 
-if ( isset($_COOKIE['imageToken']) && isset($_REQUEST['imageText']) && isset($_REQUEST['emailValidate']) )
+if (isset($_REQUEST['emailValidate']) && isset($_REQUEST['InviteCode']) )
 {
 	try
 	{
-		// Validate and send e-mail
-		$imageToken = explode('|', $_COOKIE['imageToken'], 2);
-
-		if ( count($imageToken) != 2 )
-			throw new Exception(l_t("A bad anti-script code was given, please try again"));
+		// check the invite code
 
 
-		list($Hash, $Time) = $imageToken;
 
-		if ( md5(Config::$secret.$_REQUEST['imageText'].$_SERVER['REMOTE_ADDR'].$Time) != $Hash )
-		{
-			throw new Exception(l_t("An invalid anti-script code was given, please try again"));
+		// check the email address
+		$email = strtolower(trim($_REQUEST['emailValidate']));
+
+		if(!filter_var($email, FILTER_VALIDATE_EMAIL))
+			throw new Exception(l_t("A first check of this e-mail is finding it invalid. Remember you need one to play, and it will not be spammed or released."));
+
+		$query="SELECT email FROM wD_Users WHERE email=?";
+		$row=$DBi->fetch_row("$query", false, array($email));
+		if($row)
+		throw new Exception(l_t("The e-mail address '%s', is already in use. Please choose another.",$email));
+
+		// The email address is ok, add or update registration record
+
+		$query="SELECT RegistrationID FROM bd_registrations WHERE AES_DECRYPT(email,'$aes_encrypt_key')=?";
+		$row=$DBi->fetch_row("$query",false,array($email));
+		if ($row) {$regid=$row['RegistrationID'];}
+		else {
+			$query="INSERT INTO bd_registrations (email) VALUES (AES_ENCRYPT(?,'$aes_encrypt_key'))";
+			$result=$DBi->query("$query",array($email));
+			$regid = $DBi->insert_id;
+		}// end else
+
+
+		$invitecode=trim($_REQUEST['InviteCode']);
+		$query="SELECT UserID, InviteCode FROM bd_invitecodes WHERE InviteCode=?";
+		$row=$DBi->fetch_row("$query", false, array($invitecode));
+		if(!$row) {
+			$query="UPDATE bd_registrations SET FailCount=FailCount+1";
+			$result=$DBi->query("$query",array());
+			throw new Exception(l_t('The invitation code is not valid.'));
 		}
-		elseif( (time() - 3*60) > $Time)
-		{
-			throw new Exception(l_t("This anti-script code has expired, please submit it within 3 minutes"));
+		else {
+			$source=$row['UserID'];
+			$query="UPDATE bd_registrations SET Source=?";
+			$result=$DBi->query("$query",array($source));
 		}
 
 
-		// The user's imageText is validated; he's not a robot. But does he have a real e-mail address?
-		$email = $DB->escape($_REQUEST['emailValidate']);
 
-		if( User::findEmail($email) )
-			throw new Exception(
-				l_t("The e-mail address '%s', is already in use. Please choose another.",$email));
-
-		if ( !libAuth::validate_email($email) )
-			throw new Exception(l_t("A first check of this e-mail is finding it invalid. Remember you need one to ".
-				"play, and it will not be spammed or released."));
-
-		// Prelim checks look okay, lets send the e-mail
 		$Mailer->Send(array($email=>$email), l_t('Your new BitDip account'),
-l_t("Hello and welcome!")."<br><br>
+		l_t("Hello and welcome!")."<br><br>
 
-".l_t("Thanks for validating your e-mail address; just use this link to create your new BitDip account:")."<br>
-".libAuth::email_validateURL($email)."<br><br>
+		".l_t("Thanks for validating your e-mail address; just use this link to create your new BitDip account:")."<br>
+		".libAuth::email_validateURL($email)."<br><br>
 
-".l_t("If you have any further problems contact the server's admin at %s.",Config::$adminEMail)."<br><br>
+		".l_t("If you have any further problems contact the server's admin at %s.",Config::$adminEMail)."<br><br>
 
-".l_t("Enjoy your new account!")."<br>
-"
-			);
+		".l_t("Enjoy your new account!")."<br>"
+
+		);
 
 		$page = 'emailSent';
 	}
@@ -173,10 +185,6 @@ switch($page)
 
 	case 'emailSent':
 
-		print '<h3>'.l_t('Anti-bot Validation - Confirmed!').'</h3>';
-		print "<p>".l_t("Okay, now that we know you're a human we need to check that you have a real e-mail address.")."</p>";
-
-		print '<div class="hr"></div>';
 		print '<h3>'.l_t('E-mail Validation').'</h3>';
 		print l_t("An e-mail has been sent to the address you provided (<strong>%s</strong>) ".
 			"with a link that you can click on to confirm that it's your real e-mail address, and then you're ".
