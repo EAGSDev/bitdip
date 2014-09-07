@@ -48,7 +48,7 @@ libHTML::starthtml();
 
 $page = 'firstValidationForm';
 
-if (isset($_REQUEST['emailValidate']) && isset($_REQUEST['InviteCode']) )
+if (isset($_REQUEST['emailValidate']) && isset($_REQUEST['InviteCode']) && isset($_REQUEST['Username']) )
 {
 	try
 	{
@@ -67,8 +67,27 @@ if (isset($_REQUEST['emailValidate']) && isset($_REQUEST['InviteCode']) )
 		if($row)
 		throw new Exception(l_t("The e-mail address '%s', is already in use. Please choose another.",$email));
 
-		// The email address is ok, add or update registration record
 
+
+		// check the username
+		if (isset($_REQUEST['Username']) && !empty($_REQUEST['Username'])) {
+			$username = strtolower(trim($_REQUEST['Username']));
+		}
+		else {
+			throw new Exception(l_t("Please enter a Username using only lowercase letters, numbers and underscore(_)."));
+		}
+		if (!ctype_alnum(str_replace('_', '', $username))) {
+			throw new Exception(l_t("Please enter a Username using only lowercase letters, numbers and underscore(_)."));
+		}
+		$query = "SELECT username FROM wD_Users WHERE username=?";
+		$row = $DBi->fetch_row("$query",false,array($username));
+		if ($row) {
+			throw new Exception(l_t("That Username is not available. Please enter another."));
+		}
+
+
+
+		// email and username are ok, now create registration record
 		$query="SELECT RegistrationID FROM bd_registrations WHERE AES_DECRYPT(email,'$aes_encrypt_key')=?";
 		$row=$DBi->fetch_row("$query",false,array($email));
 		if ($row) {$regid=$row['RegistrationID'];}
@@ -77,6 +96,8 @@ if (isset($_REQUEST['emailValidate']) && isset($_REQUEST['InviteCode']) )
 			$result=$DBi->query("$query",array($email));
 			$regid = $DBi->insert_id;
 		}// end else
+
+
 
 		// check the invite code
 		$invitecode=trim($_REQUEST['InviteCode']);
@@ -89,8 +110,9 @@ if (isset($_REQUEST['emailValidate']) && isset($_REQUEST['InviteCode']) )
 		}
 		else {
 			$source=$row['UserID'];
-			$query="UPDATE bd_registrations SET Source=?";
-			$result=$DBi->query("$query",array($source));
+			$query="UPDATE bd_registrations SET username=?, InviteCode=?, Source=?";
+			$result=$DBi->query("$query",array($username,$invitecode,$source));
+			// generate new invite code for source
 			$bitdip= new BitDip();
 			$newinvitecode=$bitdip->generateinvitecode();
 			$query="UPDATE bd_invitecodes SET InviteCode=? WHERE InviteCode=?";
@@ -98,12 +120,17 @@ if (isset($_REQUEST['emailValidate']) && isset($_REQUEST['InviteCode']) )
 		}
 
 
+		$url = 'http://'.$_SERVER['SERVER_NAME'].'/register.php?emailToken='.md5(Config::$secret.$email.$username.$invitecode.$regid);
+		$subject='Your new BitDip account';
+		$body='<p>Hello and welcome!</p><p>Thanks for validating your e-mail address; just use this link to create your new BitDip account:</p><p>'.$url.'</p>';
+		//$Mailer->Send(array($email=>$email),$subject,$body);
+
 
 		$Mailer->Send(array($email=>$email), l_t('Your new BitDip account'),
 		l_t("Hello and welcome!")."<br><br>
 
 		".l_t("Thanks for validating your e-mail address; just use this link to create your new BitDip account:")."<br>
-		".libAuth::email_validateURL($email)."<br><br>
+		".libAuth::email_validateURL($email)."<br>'.$url.'<br>
 
 		".l_t("If you have any further problems contact the server's admin at %s.",Config::$adminEMail)."<br><br>
 

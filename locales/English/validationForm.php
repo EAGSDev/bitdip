@@ -26,7 +26,10 @@ defined('IN_CODE') or die('This script can not be run by itself.');
 
 	<ul class="formlist">
 
-		<?php if (isset($_REQUEST['InviteCode'])) {$invitecode=$_REQUEST['InviteCode'];} else {$invitecode='';} ?>
+		<?php
+		if (isset($_REQUEST['InviteCode'])) {$invitecode=$_REQUEST['InviteCode'];} else {$invitecode='';}
+		if (isset($_REQUEST['Username'])) {$username=$_REQUEST['Username'];} else {$username='';}
+		?>
 
 		<li class="formlisttitle">Invitation Code</li>
 		<li class="formlistfield">
@@ -34,6 +37,14 @@ defined('IN_CODE') or die('This script can not be run by itself.');
 		</li>
 		<li class="formlistdesc">
 			Enter your invitation code.
+		</li>
+
+		<li class="formlisttitle">Username</li>
+		<li class="formlistfield">
+		        <input type="text" name="Username" value="<?php echo $username; ?>" />
+		</li>
+		<li class="formlistdesc">
+			Enter your BitDip username.
 		</li>
 
 
