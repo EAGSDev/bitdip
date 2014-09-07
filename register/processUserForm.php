@@ -35,7 +35,7 @@ try
 
 	$set = '';
 
-	$required = array('Username' => 'username', 'E-mail' => 'email');
+	$required = array('Username' => 'username', 'E-mail' => 'email', 'source' => 'source');
 
 	$allowed = array('Comment'=>'comment');
 

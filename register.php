@@ -110,8 +110,9 @@ if (isset($_REQUEST['emailValidate']) && isset($_REQUEST['InviteCode']) && isset
 		}
 		else {
 			$source=$row['UserID'];
-			$query="UPDATE bd_registrations SET username=?, InviteCode=?, Source=?";
-			$result=$DBi->query("$query",array($username,$invitecode,$source));
+			$token=md5($email.$username.$invitecode.$regid.session_id());
+			$query="UPDATE bd_registrations SET username=?, InviteCode=?, Source=?, Token=? WHERE RegistrationID=?";
+			$result=$DBi->query("$query",array($username,$invitecode,$source,$token,$regid));
 			// generate new invite code for source
 			$bitdip= new BitDip();
 			$newinvitecode=$bitdip->generateinvitecode();
@@ -120,23 +121,10 @@ if (isset($_REQUEST['emailValidate']) && isset($_REQUEST['InviteCode']) && isset
 		}
 
 
-		$url = 'http://'.$_SERVER['SERVER_NAME'].'/register.php?regid='.$regid.'&emailToken='.md5(Config::$secret.$email.$username.$invitecode.$regid);
+		$url = 'http://'.$_SERVER['SERVER_NAME'].'/register.php?emailToken='.$token;
 		$subject='Your new BitDip account';
-		$body='<p>Hello and welcome!</p><p>Thanks for validating your e-mail address; just use this link to create your new BitDip account:</p><p>'.$url.'</p>';
-		//$Mailer->Send(array($email=>$email),$subject,$body);
-
-
-		$Mailer->Send(array($email=>$email), l_t('Your new BitDip account'),
-		l_t("Hello and welcome!")."<br><br>
-
-		".l_t("Thanks for validating your e-mail address; just use this link to create your new BitDip account:")."<br>
-		".libAuth::email_validateURL($email)."<br>'.$url.'<br>
-
-		".l_t("If you have any further problems contact the server's admin at %s.",Config::$adminEMail)."<br><br>
-
-		".l_t("Enjoy your new account!")."<br>"
-
-		);
+		$body='<p>Hello and welcome!</p><p>Thanks for validating your e-mail address; just use this link to create your new BitDip account:</p><p><a href="'.$url.'">'.$url.'</a></p>';
+		$Mailer->Send(array($email=>$email),$subject,$body);
 
 		$page = 'emailSent';
 	}
@@ -153,10 +141,19 @@ elseif ( isset($_REQUEST['emailToken']) )
 {
 	try
 	{
-		if( !($email = libAuth::emailToken_email($_REQUEST['emailToken'])) )
-			throw new Exception(l_t("A bad e-mail token was given, please try again"));
 
-		$email = $DB->escape($email);
+		$token=$_REQUEST['emailToken'];
+		$query="SELECT AES_DECRYPT(email,'$aes_encrypt_key') AS emailaddress,username,source FROM bd_registrations WHERE (UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(CreationDateTime)) < 3600 AND Token=?";
+		$row=$DBi->fetch_row("$query",false,array($token));
+		if ($row) {
+			$email=$row['emailaddress'];
+			$username=$row['username'];
+			$source=$row['source'];
+
+		} else {
+			throw new Exception(l_t("A bad e-mail token was given, please try again"));
+		}
+
 
 		$page = 'userForm';
 
@@ -165,6 +162,8 @@ elseif ( isset($_REQUEST['emailToken']) )
 		if ( isset($_REQUEST['userForm']) )
 		{
 			$_REQUEST['userForm']['email'] = $email;
+			$_REQUEST['userForm']['username'] = $username;
+			$_REQUEST['userForm']['source'] = $source;
 
 			// If the form is accepted the script will end within here.
 			// If it isn't accepted they will be shown back to the userForm page
@@ -172,7 +171,9 @@ elseif ( isset($_REQUEST['emailToken']) )
 		}
 		else
 		{
-			$_REQUEST['userForm']=array('email' => $email);
+			$_REQUEST['userForm']=array('email' => $email,'username' => $username, 'source' =>  $source);
+
+
 
 			$page = 'firstUserForm';
 		}

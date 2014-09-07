@@ -299,7 +299,7 @@ class User {
 
 		$SQLVars = array();
 
-		$available = array('username'=>'', 'password'=>'', 'email'=>'','comment'=>'');
+		$available = array('username'=>'', 'password'=>'', 'email'=>'','comment'=>'', 'source'=>'');
 
 		$userForm = array();
 
@@ -332,6 +332,11 @@ class User {
 			{
 				$SQLVars['email'] = $userForm['email'];
 			}
+		}
+
+		if( isset($userForm['source']) )
+		{
+			$SQLVars['source'] = $userForm['source'];
 		}
 
 
