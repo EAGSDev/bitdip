@@ -27,22 +27,20 @@ defined('IN_CODE') or die('This script can not be run by itself.');
 
 ?>
 
-	<li class="formlisttitle">Invitation Codes</li>
+
 		<?php
 		$query='SELECT InviteCode FROM bd_invitecodes WHERE UserID=?';
 		$result=$DBi->fetch_rows("$query", false, array($User->id));
 		if ($result) {
+		echo '<li class="formlisttitle">Invitation Codes</li>';
 		foreach ($result as $row) {
 			echo '<div style="margin-left:50px;">'.$row['InviteCode'].'</div>';
 		}// end foreach
+		echo '<li class="formlistdesc">Give your friend one of these single-use invitation codes to join BitDip.</li>';
 		}// end if $result
-		else {
-		echo 'You have no invite codes at this time.';
-		}
-
 		?>
 
-	<li class="formlistdesc">Give your friend one of these single-use invitation codes to join BitDip.</li>
+
 
 	<li class="formlisttitle">E-mail address</li>
 	<li class="formlistfield"><input type="text" name="userForm[email]" size="50" value="<?php

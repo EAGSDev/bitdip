@@ -120,7 +120,7 @@ if (isset($_REQUEST['emailValidate']) && isset($_REQUEST['InviteCode']) && isset
 		}
 
 
-		$url = 'http://'.$_SERVER['SERVER_NAME'].'/register.php?emailToken='.md5(Config::$secret.$email.$username.$invitecode.$regid);
+		$url = 'http://'.$_SERVER['SERVER_NAME'].'/register.php?regid='.$regid.'&emailToken='.md5(Config::$secret.$email.$username.$invitecode.$regid);
 		$subject='Your new BitDip account';
 		$body='<p>Hello and welcome!</p><p>Thanks for validating your e-mail address; just use this link to create your new BitDip account:</p><p>'.$url.'</p>';
 		//$Mailer->Send(array($email=>$email),$subject,$body);
