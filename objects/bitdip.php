@@ -20,14 +20,7 @@
 
 defined('IN_CODE') or die('This script can not be run by itself.');
 
-/**
- * An object which reads/writes global named integers in the misc table. Used to
- * cache often used stats, to track the database version compared to the code
- * version, and set dynamic configuration flags (such as whether the server is in
- * panic mode)
- *
- * @package Base
- */
+
 class BitDip
 {
 
@@ -35,12 +28,28 @@ class BitDip
 		global $DBi;
 		$result='TRUE';
 		while ($result) {
-			$newinvitecode = substr(hash('sha256',time().session_id()), 3, 8);
+			$newinvitecode = substr(hash('sha256',time().session_id().rand()), 3, 8);
 			// make sure invitecode is unique
 			$query="SELECT InviteCode FROM bd_invitecodes WHERE InviteCode=?";
 			$result=$DBi->fetch_row("$query",false,array($newinvitecode));
 		}// end while
 		return $newinvitecode;
+	}// end function
+
+	public function generatesecuritykey($userid=0) {
+		global $DBi;
+		$result='TRUE';
+		while ($result) {
+			$newsecuritykey = hash('sha256',time().session_id().rand());
+			// make sure $newsecuritykey is unique
+			$query="SELECT SecurityKey FROM wD_Users WHERE SecurityKey=?";
+			$result=$DBi->fetch_row("$query",false,array($newsecuritykey));
+		}// end while
+		if ($userid != 0) {
+			$query="UPDATE wD_Users SET SecurityKey=? WHERE id=?";
+			$result=$DBi->query("$query",array($newsecuritykey,$userid));
+		}// end if ($userid != 0)
+		return $newsecuritykey;
 	}// end function
 
 }// end class

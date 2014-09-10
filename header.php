@@ -1,4 +1,5 @@
 <?php
+
 /*
     Copyright (C) 2004-2010 Kestas J. Kuliukas
 
@@ -41,6 +42,8 @@ die();*/
 
 
 session_start();
+
+
 
 if( strpos($_SERVER['PHP_SELF'], 'header.php') )
 {
@@ -212,6 +215,9 @@ if( defined('FACEBOOKSCRIPT') ) {
 	}
 }
 
+
+/*###############################
+
 require_once(l_r('lib/auth.php'));
 
 if( !defined('AJAX') )
@@ -243,6 +249,71 @@ if( !defined('AJAX') )
 
 	}
 }
+*/
+#########################################################
+################################################################
+// new authentication
+
+if (isset($_SESSION['user_data'])) {
+	$userid=$_SESSION['user_data']['id'];
+	$User = new User($userid);
+}
+else if (isset($_COOKIE['security_key'])) {
+	$givenkey=$_COOKIE['security_key'];
+	$query="SELECT id FROM wD_Users WHERE SecurityKey=?";
+	$row=$DBi->fetch_row("$query",false,array($givenkey));
+	if ($row) {$userid=$row['id'];} else {$userid=GUESTID;}
+	$User = new User($userid);
+	$_SESSION['user_data']['id']=$userid;
+}
+else {
+	$User = new User(GUESTID);
+	$_SESSION['user_data']['id']=$User->id;
+}
+
+#########################################################
+################################################################
+// logoff
+
+if (isset($_GET['logoff'])) {
+
+	$userid=$_SESSION['user_data']['id'];
+
+	//set new SecurityKey
+	$bitdip= new BitDip();
+	$newkey=$bitdip->generatesecuritykey($userid);
+
+
+	// unset cookies
+	if (isset($_SERVER['HTTP_COOKIE'])) {
+		$cookies = explode(';', $_SERVER['HTTP_COOKIE']);
+		foreach($cookies as $cookie) {
+			$parts = explode('=', $cookie);
+			$name = trim($parts[0]);
+			setcookie($name, '', time()-1000);
+			setcookie($name, '', time()-1000, '/');
+			$servername=$_SERVER['SERVER_NAME'];
+			setcookie($name, 0, time()-100, '/',"$servername",0);
+		}
+	}// end if (isset($_SERVER['HTTP_COOKIE']))
+
+	// Unset all of the session variables.
+	$_SESSION = array();
+
+	// Finally, destroy the session.
+	session_destroy();
+
+	// If its desired to kill the session, also delete the session cookie.
+	// Note: This will destroy the session, and not just the session data!
+	if (isset($_COOKIE[session_name()])) {setcookie(session_name(), '', time()-42000, '/');}
+
+	header("Location: ./logon.php");
+	die('line 310');
+}// end if (isset($_GET['logoff']))
+
+#######################################################################################
+
+
 
 // This gets called by libHTML::footer
 function close()
@@ -265,5 +336,7 @@ function close()
 
 	die();
 }
+
+
 
 ?>

@@ -25,11 +25,20 @@
 
 require_once('header.php');
 
-// Log-offs and log-ons are handled within header; here the form is presented, and forgotten passwords recovered
-
 libHTML::starthtml();
 
-if( isset($_REQUEST['forgotPassword']) and $User->type['Guest'] )
+if (isset($_SESSION['notification']) && !empty($_SESSION['notification'])) {
+	print '<div class="content">';
+	print '<p class="notice">'.$_SESSION['notification'].'</p>';
+	print '</div>';
+	$_SESSION['notification']='';
+}// end if (isset($_SESION['notification']) && !empty($_SESSION['notification']))
+
+
+###########################################
+// forgot password
+
+if( isset($_GET['forgotPassword']) and $User->type['Guest'] )
 {
 	print libHTML::pageTitle(l_t('Reset your password'),l_t('Resetting passwords using your e-mail account, in-case you forgot your password.'));
 
@@ -98,38 +107,35 @@ l_t("You can use this link to get a new password generated:")."<br>
 	libHTML::footer();
 }
 
+##############################################
+// user logon
+
 
 
 if( ! $User->type['User'] ) {
-	print libHTML::pageTitle(l_t('Log on'),l_t('Enter your webDiplomacy account username and password to log into your account.'));
+	print libHTML::pageTitle('Log on','Enter your BitDip account username and password to log into your account.');
 	print '
-		<form action="./index.php" method="post">
+		<form action="./logon_form_process.php" method="post">
 
 		<ul class="formlist">
 
-		<li class="formlisttitle">'.l_t('Username').'</li>
+		<li class="formlisttitle">'.'Username'.'</li>
 		<li class="formlistfield"><input type="text" tabindex="1" maxlength=30 size=15 name="loginuser"></li>
-		<li class="formlistdesc">'.l_t('Your webDiplomacy username. If you don\'t have one please '.
-			'<a href="register.php" class="light">register</a>.').'</li>
+		<li class="formlistdesc">Your BitDip username -- if you don\'t have one please <a href="register.php" class="light">register</a></li>
 
-		<li class="formlisttitle">'.l_t('Password').'</li>
+		<li class="formlisttitle">Password</li>
 		<li class="formlistfield"><input type="password" tabindex="2" maxlength=30 size=15 name="loginpass"></li>
-		<li class="formlistdesc">'.l_t('Your webDiplomacy password.').'</li>
+		<li class="formlistdesc">Your BitDip password</li>
 
-		<li class="formlisttitle">'.l_t('Remember me').'</li>
-		<li class="formlistfield"><input type="checkbox" /></li>
-		<li class="formlistdesc">'.l_t('Do you want to stay logged in permanently? '.
-			'If you are on a public computer you should not stay logged on permanently!').'</li>
-
-		<li><input type="submit" class="form-submit" value="'.l_t('Log on').'"></li>
+		<li><input type="submit" class="form-submit" value="Log on"></li>
 		</ul>
 		</form>
-		<p><a href="logon.php?forgotPassword=1" class="light">'.l_t('Forgot your password?').'</a></p>';
+		<p><a href="logon.php?forgotPassword=1" class="light">Forgot your password?</a></p>';
 } else {
 	print libHTML::pageTitle('Log off','Log out of your webDiplomacy account, to prevent other users of this computer accessing it.');
 	print '<form action="./logon.php" method="get">
 		<p class="notice"><input type="hidden" name="logoff" value="on">
-		<input type="submit" class="form-submit" value="'.l_t('Log off').'"></p>
+		<input type="submit" class="form-submit" value="Log off"></p>
 		</form>';
 }
 
