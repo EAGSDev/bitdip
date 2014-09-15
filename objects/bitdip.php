@@ -52,6 +52,18 @@ class BitDip
 		return $newsecuritykey;
 	}// end function
 
+
+	function generatepassword($length=16) {
+		$password = '';
+		$symbols=array('!','@','#','$','%','&','+','_','+','=');
+		$parts = array_merge(range(0, 9),range('a', 'z'),range('A', 'Z'),$symbols);
+		$parts = array_merge(range(0, 9),range('a', 'z'),range('A', 'Z'));
+		while (strlen($password) <= $length) {
+			$password .= $parts[array_rand($parts)];
+		}// end for
+		return $password;
+	}// end function
+
 }// end class
 
 ?>
