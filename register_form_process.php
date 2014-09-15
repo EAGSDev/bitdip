@@ -50,12 +50,12 @@ if (isset($_POST['emailValidate']) && isset($_POST['InviteCode']) && isset($_POS
 	// email and username are ok, now update or create registration record
 
 	if (empty($error)) {
-		$query="SELECT RegistrationID FROM bd_registrations WHERE AES_DECRYPT(email,'$aes_encrypt_key')=?";
-		$row=$DBi->fetch_row("$query",false,array($email));
+		$query="SELECT RegistrationID FROM bd_registrations WHERE AES_DECRYPT(email,?)=?";
+		$row=$DBi->fetch_row("$query",false,array($aes_encrypt_key,$email));
 		if ($row) {$regid=$row['RegistrationID'];}
 		else {
-			$query="INSERT INTO bd_registrations (email,username) VALUES (AES_ENCRYPT(?,'$aes_encrypt_key'),?)";
-			$result=$DBi->query("$query",array($email,$username));
+			$query="INSERT INTO bd_registrations (email,username) VALUES (AES_ENCRYPT(?,?),?)";
+			$result=$DBi->query("$query",array($email,$aes_encrypt_key,$username));
 			$regid = $DBi->insert_id;
 		}// end else
 	}
@@ -108,8 +108,8 @@ else if (isset($_POST['emailToken']) && isset($_POST['password']) && isset($_POS
 	$comment=$_POST['comment'];
 	$password=$_POST['password'];
 
-	$query="SELECT AES_DECRYPT(email,'$aes_encrypt_key') AS emailaddress,username,source FROM bd_registrations WHERE (UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(CreationDateTime)) < 3600 AND Token=?";
-	$row=$DBi->fetch_row("$query",false,array($token));
+	$query="SELECT AES_DECRYPT(email,?) AS emailaddress,username,source FROM bd_registrations WHERE (UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(CreationDateTime)) < 3600 AND Token=?";
+	$row=$DBi->fetch_row("$query",false,array($aes_encrypt_key,$token));
 	if ($row) {
 		$email=$row['emailaddress'];
 		$username=$row['username'];

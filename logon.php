@@ -38,81 +38,28 @@ if (isset($_SESSION['notification']) && !empty($_SESSION['notification'])) {
 ###########################################
 // forgot password
 
-if( isset($_GET['forgotPassword']) and $User->type['Guest'] )
-{
-	print libHTML::pageTitle(l_t('Reset your password'),l_t('Resetting passwords using your e-mail account, in-case you forgot your password.'));
+if( isset($_GET['forgotPassword'])) {
 
-	try
-	{
-		if ( $_REQUEST['forgotPassword'] == 1 )
-		{
-			print '<p>'.l_t('Enter your username here, and an e-mail will be sent to the address you registered with, with an '.
-			'activation link that will set a new password.').'</p>
+	print libHTML::pageTitle('Reset your password','Resetting passwords using your e-mail account, in-case you forgot your password.');
 
-			<form action="./logon.php?forgotPassword=2" method="post">
-				<ul class="formlist">
-				<li class="formlisttitle">'.l_t('Username').'</li>
-				<li class="formlistfield"><input type="text" tabindex="1" maxlength=30 size=15 name="forgotUsername"></li>
-				<li class="formlistdesc">'.l_t('The webDiplomacy username of the account which you can\'t log in to.').'</li>
-				<li><input type="submit" class="form-submit" value="'.l_t('Send code').'"></li>
-				</ul>
-			</form>';
-		}
-		elseif ( $_REQUEST['forgotPassword'] == 2 && isset($_REQUEST['forgotUsername']) )
-		{
-			try {
-				$forgottenUser = new User(0,$DB->escape($_REQUEST['forgotUsername']));
-			} catch(Exception $e) {
-				throw new Exception(l_t("Cannot find an account for the given username, please ".
-					"<a href='logon.php?forgotPassword=1' class='light'>go back</a> and check your spelling."));
-			}
+	print '<p>Enter your username OR your email address here and you will receice a temporary password by email.</p>';
+	print '<form action="./logon_form_process.php" method="post">';
+	print '<ul class="formlist">';
+	print '<li class="formlisttitle">Username or Email Address</li>';
+	print '<li class="formlistfield"><input type="text" tabindex="1" maxlength=30 size=15 name="forgotUsername"></li>';
+	print '<li class="formlistdesc">The BitDip username or email address of the account which you can\'t log in to.</li>';
+	print '<li><input type="submit" class="form-submit" value="Reset Password"></li>';
+	print '</ul>';
+	print '</form>';
 
-			require_once(l_r('objects/mailer.php'));
-			$Mailer = new Mailer();
-			$Mailer->Send(array($forgottenUser->email=>$forgottenUser->username), l_t('webDiplomacy forgotten password verification link'),
-l_t("You can use this link to get a new password generated:")."<br>
-".libAuth::email_validateURL($forgottenUser->email)."&forgotPassword=3<br><br>
 
-".l_t("If you have any further problems contact the server's admin at %s.",Config::$adminEMail)."<br>");
+}// end if( isset($_GET['forgotPassword']))
 
-			print '<p>'.l_t('An e-mail has been sent with a verification link, which will allow you to have your password reset. '.
-				'If you can\'t find the e-mail in your inbox try your junk folder/spam-box.').'</p>';
-		}
-		elseif ( $_REQUEST['forgotPassword'] == 3 && isset($_REQUEST['emailToken']) )
-		{
-			$email = $DB->escape(libAuth::emailToken_email($_REQUEST['emailToken']));
-
-			$userID = User::findEmail($email);
-
-			$newPassword = base64_encode(rand(1000000000,2000000000));
-
-			$DB->sql_put("UPDATE wD_Users
-				SET password=UNHEX('".libAuth::pass_Hash($newPassword)."')
-				WHERE id=".$userID." LIMIT 1");
-
-			print '<p>'.l_t('Thanks for verifying your address, this is your new password, which you can '.
-					'change once you have logged back on:').'<br /><br />
-
-				<strong>'.$newPassword.'</strong></p>
-
-				<p><a href="logon.php" class="light">'.l_t('Back to log-on prompt').'</a></p>';
-		}
-	}
-	catch(Exception $e)
-	{
-		print '<p class="notice">'.$e->getMessage().'</p>';
-	}
-
-	print '</div>';
-	libHTML::footer();
-}
 
 ##############################################
 // user logon
 
-
-
-if( ! $User->type['User'] ) {
+else {
 	print libHTML::pageTitle('Log on','Enter your BitDip account username and password to log into your account.');
 	print '
 		<form action="./logon_form_process.php" method="post">
@@ -120,24 +67,20 @@ if( ! $User->type['User'] ) {
 		<ul class="formlist">
 
 		<li class="formlisttitle">'.'Username'.'</li>
-		<li class="formlistfield"><input type="text" tabindex="1" maxlength=30 size=15 name="loginuser"></li>
+		<li class="formlistfield"><input type="text" tabindex="1" maxlength=30 size=30 name="loginuser"></li>
 		<li class="formlistdesc">Your BitDip username -- if you don\'t have one please <a href="register.php" class="light">register</a></li>
 
 		<li class="formlisttitle">Password</li>
-		<li class="formlistfield"><input type="password" tabindex="2" maxlength=30 size=15 name="loginpass"></li>
+		<li class="formlistfield"><input type="password" tabindex="2" maxlength=72 size=30 name="loginpass"></li>
 		<li class="formlistdesc">Your BitDip password</li>
 
 		<li><input type="submit" class="form-submit" value="Log on"></li>
 		</ul>
 		</form>
-		<p><a href="logon.php?forgotPassword=1" class="light">Forgot your password?</a></p>';
-} else {
-	print libHTML::pageTitle('Log off','Log out of your webDiplomacy account, to prevent other users of this computer accessing it.');
-	print '<form action="./logon.php" method="get">
-		<p class="notice"><input type="hidden" name="logoff" value="on">
-		<input type="submit" class="form-submit" value="Log off"></p>
-		</form>';
+		<p><a href="logon.php?forgotPassword=1" class="light">Reset password?</a></p>';
 }
+
+
 
 print '</div>';
 libHTML::footer();
