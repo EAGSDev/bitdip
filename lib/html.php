@@ -594,7 +594,7 @@ class libHTML
 			{
 				$links['logon.php']=array('name'=>'Log off', 'inmenu'=>false, 'title'=>"Log onto webDiplomacy using an existing user account");
 				$links['gamecreate.php']=array('name'=>'New game', 'inmenu'=>TRUE, 'title'=>"Start up a new game");
-				$links['usercp.php']=array('name'=>'Settings', 'inmenu'=>TRUE, 'title'=>"Change your user specific settings");
+				$links['account.php']=array('name'=>'Account', 'inmenu'=>TRUE, 'title'=>"Change your account settings");
 			}
 		}
 		$links['help.php']=array('name'=>'Help', 'inmenu'=>TRUE, 'title'=>'Get help and information; guides, intros, FAQs, stats, links');
