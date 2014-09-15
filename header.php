@@ -24,26 +24,23 @@
  * @package Base
  */
 
-//$_SERVER['HTTP_CACHE_CONTROL'] = 'max-age=10000';
-
-/*
-function setExpires($expires) {
- header('Expires: '.gmdate('D, d M Y H:i:s', time()+$expires).'GMT');
- header('Last-Modified: '.gmdate('D, d M Y H:i:s', time()-$expires).'GMT');
-}
-
-setExpires(600);
-echo ( 'This page will self destruct in 10 seconds<br />' );
-echo ( 'The GMT is now '.gmdate('H:i:s').'<br />' );
-echo ( 'The GMT is now '.gmdate('H:i:s',time()).'<br />' );
-echo ( '<a href="'.$_SERVER['PHP_SELF'].'">View Again</a><br />' );
-
-die();*/
 
 
+#########################################################
+// session management
 session_start();
 
+if (!isset($_SESSION['timeout_idle'])) {$_SESSION['timeout_idle'] = time() + 900;}
+else {
+    if ($_SESSION['timeout_idle'] < time()) {
+    session_destroy();
+    session_start();
+	$_SESSION['timeout_idle'] = time() + 900;
+    }
+    else {$_SESSION['timeout_idle'] = time() + 900;}
+}// end else
 
+#######################################################
 
 if( strpos($_SERVER['PHP_SELF'], 'header.php') )
 {
