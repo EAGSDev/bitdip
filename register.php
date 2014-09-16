@@ -62,7 +62,7 @@ if (isset($_GET['emailToken'])) {$token=$_GET['emailToken'];} else {$token='';}
 switch($page)
 {
 	case 'firstValidationForm':
-		print '<h2>Welcome to Bitcoin Diplomacy!</h2>';
+		print '<h2>Welcome to BitDip!</h2>';
 		print '<p>In order to join BitDip you must have a valid invitation code from a current member. If you don\'t know an existing member, try finding one at <a href="http://webdiplomacy.net">webDiplomacy.net</a> or contact jimbursch at bitdip.net.</p>';
 
 	case 'validationForm':
