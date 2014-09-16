@@ -1,22 +1,5 @@
 <?php
-/*
-    Copyright (C) 2004-2010 Kestas J. Kuliukas
 
-	This file is part of webDiplomacy.
-
-    webDiplomacy is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    webDiplomacy is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with webDiplomacy.  If not, see <http://www.gnu.org/licenses/>.
- */
 
 define('AJAX', true); // Makes header.php ignore some of the unneeded stuff, mainly loading $User
 
@@ -48,15 +31,15 @@ $results = array('status'=>'Invalid', 'notice'=>'No valid action specified');
 
 if( isset($_GET['likeMessageToggleToken']) ) {
 	if( libAuth::likeToggleToken_Valid($_GET['likeMessageToggleToken']) ) {
-		
+
 		$token = explode('_', $_GET['likeMessageToggleToken']);
 		$userID = (int) $token[0];
 		$likeMessageID = (int) $token[1];
-		
+
 		$DB->sql_put("BEGIN");
-		
+
 		list($likeExists) = $DB->sql_row("SELECT COUNT(*) FROM wD_LikePost WHERE userID = ".$userID." AND likeMessageID = ".$likeMessageID);
-		
+
 		if( $likeExists == 0  )
 		{
 			$DB->sql_put("UPDATE wD_ForumMessages SET likeCount = likeCount + 1 WHERE id = ".$likeMessageID);
@@ -67,7 +50,7 @@ if( isset($_GET['likeMessageToggleToken']) ) {
 			$DB->sql_put("UPDATE wD_ForumMessages SET likeCount = likeCount - 1 WHERE id = ".$likeMessageID);
 			$DB->sql_put("DELETE FROM wD_LikePost WHERE userID = ".$userID." AND likeMessageID = ".$likeMessageID);
 		}
-		
+
 		$DB->sql_put("COMMIT");
 	}
 }

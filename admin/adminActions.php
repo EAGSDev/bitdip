@@ -1,22 +1,4 @@
 <?php
-/*
-    Copyright (C) 2004-2010 Kestas J. Kuliukas
-
-	This file is part of webDiplomacy.
-
-    webDiplomacy is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    webDiplomacy is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with webDiplomacy.  If not, see <http://www.gnu.org/licenses/>.
- */
 
 defined('IN_CODE') or die('This script can not be run by itself.');
 
@@ -208,12 +190,12 @@ class adminActions extends adminActionsForms
 		$Game = $Variant->processGame($params['gameID']);
 		$Game->resetMinimumBet();
 		return l_t("The minimum bet has been reset.");
-		
+
 	}
 	public function syncForumLikes(array $params)
 	{
 		global $DB;
-		
+
 		$DB->sql_put("UPDATE wD_ForumMessages fm
 			INNER JOIN (
 			SELECT f.id, COUNT(*) as likeCount
@@ -222,10 +204,10 @@ class adminActions extends adminActionsForms
 			GROUP BY f.id
 			) l ON l.id = fm.id
 			SET fm.likeCount = l.likeCount");
-		
+
 		return l_t("All forum like counts have been synced, %s posts affected.", $DB->last_affected());
 	}
-	
+
 	public function unCrashGames(array $params)
 	{
 		global $DB;
@@ -739,15 +721,15 @@ class adminActions extends adminActionsForms
 			// main gamemaster loop, and wants to stop the loop from continuing to use this game after
 			// it has been cancelled. But it also contains its own commit, so the exception does not prevent
 			// the game from being cancelled (it is messy though).
-			
+
 			// This point after $Game->setCancelled(); shouldn't actually be reached.
 		}
 		elseif( $Game->phase == 'Finished' )
 		{
-			/* 
+			/*
 			 * Some special action is needed; this game has already finished.
-			 * 
-			 * We need to get back all winnings that have been distributed first, then we need to 
+			 *
+			 * We need to get back all winnings that have been distributed first, then we need to
 			 * return all starting bets.
 			 */
 			$transactions = array();
@@ -758,22 +740,22 @@ class adminActions extends adminActionsForms
 			{
 				if( !isset($transactions[$userID])) $transactions[$userID] = array();
 				if( !isset($transactions[$userID][$type])) $transactions[$userID][$type] = 0;
-				
+
 				if( $type != 'Bet' ) $points = $points * -1; // Bets are to be credited back, everything else is to be debited
-				
+
 				if( $type != 'Supplement') $sumPoints += $points;
-				
+
 				$transactions[$userID][$type] += $points;
 			}
-			
-			
+
+
 			// Check that the total points transactions within this game make sense (i.e. they add up to roughly 0 accounting for rounding errors)
 			if( $sumPoints < (count($transactions)*-1) or count($transactions) < $sumPoints )
 				throw new Exception(l_t("The total points transactions (in a finished game) add up to %s, but there are %s members; ".
 					"cannot cancel game with an unusual points transaction log.", $sumPoints, count($transactions)), 274);
-			
+
 			// The points transactions make sense; we can now try and reverse them.
-			
+
 			// Get the current points each user has
 			$tabl = $DB->sql_tabl("SELECT u.id, u.points FROM wD_Users u INNER JOIN wD_PointsTransactions pt ON pt.userID = u.id WHERE pt.gameID = ".$Game->id
 			." GROUP BY u.id, u.points "
@@ -785,8 +767,8 @@ class adminActions extends adminActionsForms
 				$sumPoints = 0;
 				foreach($transactions[$userID] as $type=>$typePoints)
 					$sumPoints += $typePoints;
-				
-				
+
+
 				if( ( $points + $sumPoints) < 0 )
 				{
 					// If the user doesn't have enough points on hand to pay back the points transactions for this game we will need to supplement him the points to do it:
@@ -795,12 +777,12 @@ class adminActions extends adminActionsForms
 					$DB->sql_put("INSERT INTO wD_PointsTransactions ( type, points, userID, gameID ) VALUES ( 'Supplement', ".$supplementPoints.", ".$userID.", ".$Game->id.")");
 					$DB->sql_put("UPDATE wD_Users SET points = ".$points." WHERE id = ".$userID);
 				}
-				
+
 				// Now we have given the user enough points so their points transactions for this game can definitely be undone:
 				$DB->sql_put("INSERT INTO wD_PointsTransactions ( type, points, userID, gameID ) VALUES ( 'Correction', ".$sumPoints.", ".$userID.", ".$Game->id.")");
 				$points += $sumPoints;
 				$DB->sql_put("UPDATE wD_Users SET points = ".$points." WHERE id = ".$userID);
-				
+
 				// Now check that they don't need a supplement to bring their total points in play back up to 100:
 				$pointsInPlay = User::pointsInPlay($userID);
 				if( ($points + $pointsInPlay) < 100 )
@@ -810,16 +792,16 @@ class adminActions extends adminActionsForms
 					$DB->sql_put("INSERT INTO wD_PointsTransactions ( type, points, userID, gameID ) VALUES ( 'Supplement', ".$supplementPoints.", ".$userID.", ".$Game->id.")");
 					$DB->sql_put("UPDATE wD_Users SET points = ".$points." WHERE id = ".$userID);
 				}
-				
+
 				notice::send(
 					$userID, $Game->id, 'Game',
-					'No', 'No', 
+					'No', 'No',
 					l_t("This game has been cancelled after having finished (usually to undo the effects of cheating). ".
 						"%s points had to be added/taken from your account to undo the effects of the game. ".
-					"Please contact the mod team with any queries.", $sumPoints, $points), 
+					"Please contact the mod team with any queries.", $sumPoints, $points),
 					$Game->name, $Game->id);
 			}
-			
+
 			// Now backup and erase the game from existence, then commit:
 			processGame::eraseGame($Game->id);
 		}
@@ -827,10 +809,10 @@ class adminActions extends adminActionsForms
 		{
 			throw new Exception(l_t('This game is in phase %s, so it can\'t be cancelled',$Game->phase), 987);
 		}
-		
+
 		// $DB->sql_put("COMMIT"); // $
 
-		return l_t('This game was cancelled.'); 
+		return l_t('This game was cancelled.');
 	}
 	public function togglePause(array $params)
 	{
@@ -970,7 +952,7 @@ class adminActions extends adminActionsForms
 				// The game may need a time extension to allow for a new player to be added
 
 				$Game->resetMinimumBet();
-				
+
 				// Would the time extension would give a difference of more than ten minutes? If not don't bother
 				if ( (time() + $Game->phaseMinutes*60) - $Game->processTime > 10*60 ) {
 
@@ -1085,9 +1067,9 @@ class adminActions extends adminActionsForms
 
 		$userID = (int)$params['userID'];
 		$gameID = (int)$params['gameID'];
-		
+
 		$DB->sql_put("UPDATE wD_Games SET directorUserID = ".$userID." WHERE id = ".$gameID);
-		
+
 		return l_t("The specified user ID has been assigned as the director for this game.");
 	}
 }

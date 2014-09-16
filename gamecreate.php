@@ -1,22 +1,5 @@
 <?php
-/*
-    Copyright (C) 2004-2010 Kestas J. Kuliukas
 
-	This file is part of webDiplomacy.
-
-    webDiplomacy is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    webDiplomacy is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with webDiplomacy.  If not, see <http://www.gnu.org/licenses/>.
- */
 
 /**
  * @package Base
@@ -53,7 +36,7 @@ if( isset($_REQUEST['newGame']) and is_array($_REQUEST['newGame']) )
 
 		if ( !isset($form['missingPlayerPolicy']) )
 			$form['missingPlayerPolicy'] = 'Normal';
-		
+
 		foreach($required as $requiredName)
 		{
 			if ( isset($form[$requiredName]) )
@@ -104,9 +87,9 @@ if( isset($_REQUEST['newGame']) and is_array($_REQUEST['newGame']) )
 		{
 			throw new Exception(l_t("Joining period value out of range."));
 		}
-		
+
 		$input['anon'] = ( (strtolower($input['anon']) == 'yes') ? 'Yes' : 'No' );
-		
+
 		switch($input['pressType']) {
 			case 'PublicPressOnly':
 				$input['pressType'] = 'PublicPressOnly';
@@ -118,7 +101,7 @@ if( isset($_REQUEST['newGame']) and is_array($_REQUEST['newGame']) )
 			default:
 				$input['pressType'] = 'Regular';
 		}
-		
+
 		switch($input['missingPlayerPolicy']) {
 			case 'Wait':
 				$input['missingPlayerPolicy'] = 'Wait';
@@ -130,15 +113,15 @@ if( isset($_REQUEST['newGame']) and is_array($_REQUEST['newGame']) )
 		// Create Game record & object
 		require_once(l_r('gamemaster/game.php'));
 		$Game = processGame::create(
-			$input['variantID'], 
-			$input['name'], 
-			$input['password'], 
-			$input['bet'], 
-			$input['potType'], 
-			$input['phaseMinutes'], 
-			$input['joinPeriod'], 
-			$input['anon'], 
-			$input['pressType'], 
+			$input['variantID'],
+			$input['name'],
+			$input['password'],
+			$input['bet'],
+			$input['potType'],
+			$input['phaseMinutes'],
+			$input['joinPeriod'],
+			$input['anon'],
+			$input['pressType'],
 			$input['missingPlayerPolicy']);
 
 		// Create first Member record & object

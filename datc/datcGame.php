@@ -1,22 +1,5 @@
 <?php
-/*
-    Copyright (C) 2004-2010 Kestas J. Kuliukas
 
-	This file is part of webDiplomacy.
-
-    webDiplomacy is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    webDiplomacy is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with webDiplomacy.  If not, see <http://www.gnu.org/licenses/>.
- */
 
 defined('IN_CODE') or die('This script can not be run by itself.');
 
@@ -144,7 +127,7 @@ class datcGame extends processGame
 
 			foreach(array('unitType','viaConvoy','criteria','legal') as $localizeColumn)
 				$hash[$localizeColumn] = l_t($hash[$localizeColumn]);
-			
+
 			print '<tr class="replyalternate'.$alternate.'"><td>'.implode('</td><td>', $hash).'</td></tr>';
 
 			$alternate = 3-$alternate;
@@ -361,7 +344,7 @@ class datcGame extends processGame
 				if( (!$invalid && $hash['legal']!='Yes') || ( $invalid && $hash['legal']=='Yes' ))
 				{
 					$failed = true;
-					
+
 					print l_t('Failed on the following order, failed criteria = legal=%s'.
 						($invalid?' given order doesnt match received':'result was complete ').
 						':<br />%s<br /><br />',$hash['legal'],nl2br(print_r($hash,true)));

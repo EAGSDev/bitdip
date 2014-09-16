@@ -1,22 +1,5 @@
 <?php
-/*
-    Copyright (C) 2004-2010 Kestas J. Kuliukas
 
-	This file is part of webDiplomacy.
-
-    webDiplomacy is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    webDiplomacy is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with webDiplomacy.  If not, see <http://www.gnu.org/licenses/>.
- */
 
 defined('IN_CODE') or die('This script can not be run by itself.');
 
@@ -224,7 +207,7 @@ else
 
 		<strong>Default:</strong> No password set
 	</li>
-<!-- 
+<!--
 	<li class="formlisttitle">
 		No moves received options:
 	</li>
@@ -234,12 +217,12 @@ else
 	</li>
 	<li class="formlistdesc">
 		What should happen if the end of the turn comes and a player has not submitted any orders?<br /><br />
-		
-		If set to <strong>Normal</strong> the game will proceed, and after 
+
+		If set to <strong>Normal</strong> the game will proceed, and after
 		a couple of turns they will go into civil disorder and their country can be taken over by another player.<br /><br />
-		
+
 		If set to <strong>Wait for all players</strong> the game will not continue until all players have submitted their orders.<br />
-		This avoids any issues caused by 
+		This avoids any issues caused by
 		someone not submitting their orders on time, but it means that if someone becomes unavailable the game will not continue until they either
 		return, or a moderator manually sets them to civil disorder.<br /><br />
 

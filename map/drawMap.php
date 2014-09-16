@@ -1,22 +1,5 @@
 <?php
-/*
-    Copyright (C) 2004-2010 Kestas J. Kuliukas
 
-	This file is part of webDiplomacy.
-
-    webDiplomacy is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    webDiplomacy is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with webDiplomacy.  If not, see <http://www.gnu.org/licenses/>.
- */
 
 defined('IN_CODE') or die('This script can not be run by itself.');
 
@@ -822,21 +805,21 @@ abstract class drawMap
 		}
 
 		list($r, $g, $b) = $color;
-		
-		// Try to allocate the color from the palette .. 
+
+		// Try to allocate the color from the palette ..
 		$colorRes = imagecolorexact($image['image'], $r, $g, $b);
 		if ($colorRes == -1)
 		{
-			// .. if the color doesn't exist within the palette add it to the palette (which can hit a limit if the palette gets full) .. 
+			// .. if the color doesn't exist within the palette add it to the palette (which can hit a limit if the palette gets full) ..
 			$colorRes = imageColorAllocate($image['image'], $r, $g, $b);
-			
+
 			if (!$colorRes)
 			{
 				// .. and failing that get the best available thing.
 				$colorRes = imageColorClosest($image['image'], $r, $g, $b);
 			}
 		}
-		
+
 		return $colorRes;
 	}
 

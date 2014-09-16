@@ -1,22 +1,5 @@
 <?php
-/*
-    Copyright (C) 2004-2010 Kestas J. Kuliukas
 
-	This file is part of webDiplomacy.
-
-    webDiplomacy is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    webDiplomacy is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with webDiplomacy.  If not, see <http://www.gnu.org/licenses/>.
- */
 
 defined('IN_CODE') or die('This script can not be run by itself.');
 
@@ -65,7 +48,7 @@ class adminActionsForms
 			print '<input type="hidden" name="globalUserID" value="'.intval($_REQUEST['globalUserID']).'" />';
 		if ( isset($_REQUEST['globalPostID']) )
 			print '<input type="hidden" name="globalPostID" value="'.intval($_REQUEST['globalPostID']).'" />';
-		
+
 		if ($description)
 			print '<li class="formlistdesc" style="margin-bottom:10px">'.l_t($description).'</li>';
 
@@ -125,19 +108,19 @@ class adminActionsForms
 		$DB->sql_put("INSERT INTO wD_AdminLog ( name, userID, time, details, params )
 					VALUES ( '".$name."', ".$User->id.", ".time().", '".$details."', '".$paramValues."' )");
 	}
-	
+
 	/**
 	 * Defines the PHP script which the forms will target; will either be board.php or admincp.php
 	 * @var string
 	 */
 	public static $target;
-	
+
 	/**
 	 * A reference to the static array of actions
 	 * @var array
 	 */
 	public $actionsList;
-	
+
 	/**
 	 * For the given task display the form, and run the task if data entered from the corresponding form
 	 *
@@ -337,11 +320,11 @@ require_once(l_r('lib/gamemessage.php'));
 if( defined("INBOARD") )
 {
 	// We're running in Director mode from within board.php
-	
+
 	$adminActions = new adminActionsTD();
 	adminActionsForms::$target = "board.php?gameID=".$Game->id;
 	$adminActions->actionsList = adminActionsTD::$actions;
-	
+
 	print '<h3>'.l_t('Director action forms').'</h3>';
 	// For each task display the form, and run the task if data entered from the corresponding form
 	print '<ul class="formlist">';
@@ -355,37 +338,37 @@ else
 {
 	print '<div class="hr"></div>';
 	adminActionsLayout::printActionShortcuts();
-	
+
 	if ( $User->type['Admin'] )
 		$adminActions = new adminActionsRestricted();
 	elseif ( $User->type['ForumModerator'] )
 		$adminActions = new adminActionsForum();
 	else
 		$adminActions = new adminActions();
-	
+
 	adminActionsForms::$target = "admincp.php";
 	$adminActions->actionsList = adminActions::$actions;
-	
+
 	// Create a bullet-point set of anchor shortcuts to each task
-	
+
 	$actionCodesByType = adminActionsLayout::actionCodesByType();
-	
+
 	print '<h3>'.l_t('Admin actions').'</h3>';
 	foreach($actionCodesByType as $type=>$actionCodes)
 	{
 		print '<a name="'.strtolower($type).'Actions"></a><h4>'.l_t($type.' actions').'</h4>';
 		adminActionsLayout::printActionLinks($actionCodes);
 	}
-	
+
 	print '<div class="hr"></div>';
-	
+
 	print '<h3>'.l_t('Forms').'</h3>';
 	// For each task display the form, and run the task if data entered from the corresponding form
 	print '<ul class="formlist">';
 	foreach($actionCodesByType as $type=>$actionCodes)
 	{
 		print '<h4>'.l_t($type.' actions').'</h4>';
-	
+
 		foreach($actionCodes as $actionCode)
 			$adminActions->process($actionCode);
 	}

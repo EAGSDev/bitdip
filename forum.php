@@ -1,22 +1,4 @@
 <?php
-/*
-    Copyright (C) 2004-2010 Kestas J. Kuliukas
-
-	This file is part of webDiplomacy.
-
-    webDiplomacy is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    webDiplomacy is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with webDiplomacy.  If not, see <http://www.gnu.org/licenses/>.
- */
 
 
 /**
@@ -181,7 +163,7 @@ AND ($_REQUEST['newmessage'] != "") ) {
 			{
 				// To a thread
 				$threadDetails = $DB->sql_hash(
-					"SELECT f.id, f.latestReplySent, 
+					"SELECT f.id, f.latestReplySent,
 						f.silenceID,
 						silence.userID as silenceUserID,
 						silence.postID as silencePostID,
@@ -190,7 +172,7 @@ AND ($_REQUEST['newmessage'] != "") ) {
 						silence.startTime as silenceStartTime,
 						silence.length as silenceLength,
 						silence.reason as silenceReason
-					FROM wD_ForumMessages f 
+					FROM wD_ForumMessages f
 					LEFT JOIN wD_Silences silence ON ( f.silenceID = silence.id )
 					WHERE f.id=".$new['sendtothread']."
 						AND f.type='ThreadStart'");
@@ -202,14 +184,14 @@ AND ($_REQUEST['newmessage'] != "") ) {
 				}
 				elseif( Silence::isSilenced($threadDetails) ) {
 					$silence = new Silence($threadDetails);
-					
+
 					if( $silence->isEnabled() ) {
 						$messageproblem=l_t("The thread you are attempting to reply to has been silenced; ").$silence->reason;
 					}
-					
+
 					unset($silence);
 				}
-				
+
 				if( isset($threadDetails['id']) && !isset($messageproblem) )
 				{
 					// It's being sent to an existing, non-silenced / dated thread.
@@ -237,7 +219,7 @@ AND ($_REQUEST['newmessage'] != "") ) {
 				{
 					$messageproblem=l_t("The thread you attempted to reply to doesn't exist.");
 				}
-				
+
 				unset($threadDetails);
 			}
 		}
@@ -288,12 +270,12 @@ print '
 	';
 	if( $User->isSilenced() ) {
 		print '<div class="message-body postbox" style="padding-top:0; padding-left:auto; padding-right:auto">';
-		
+
 		print '<p>'.l_t('Cannot post due to a temporary silence:').$User->getActiveSilence()->toString().'</p>
 				<div class="hr"></div>
 				<p>'.l_t('Please see <a class="light" href="rules.php#silenceInfo">our silenced section</a> '.
 				'for info on how to dispute it or get the length reduced.').'</p>';
-		
+
 		print '</div>';
 	}
 	else
@@ -306,10 +288,10 @@ print '
 				'<a href="http://forum.webdiplomacy.net">todo list</a>.').'<br />
 				'.l_t('If you are posting a question please <strong>check the <a href="faq.php">FAQ</a></strong> before posting.').'<br />
 				'.l_t('If your message is long you may need to write a summary message, and add the full message as a reply.').'
-	
+
 		</div>
 		<div class="hr" ></div>
-	
+
 		<div class="message-body postbox" style="padding-top:0; padding-left:auto; padding-right:auto">
 
 			<form class="safeForm" action="forum.php#postbox" method="post"><p>
@@ -361,8 +343,8 @@ if( file_exists($cacheHTML) )
 
 $tabl = $DB->sql_tabl("SELECT
 	f.id, f.fromUserID, f.timeSent, f.message, f.subject, f.replies,
-		u.username as fromusername, u.points as points, f.latestReplySent, IF(s.userID IS NULL,0,1) as online, u.type as userType, 
-		f.likeCount as likeCount, 
+		u.username as fromusername, u.points as points, f.latestReplySent, IF(s.userID IS NULL,0,1) as online, u.type as userType,
+		f.likeCount as likeCount,
 		f.silenceID,
 		silence.userID as silenceUserID,
 		silence.postID as silencePostID,
@@ -390,7 +372,7 @@ while( $message = $DB->tabl_hash($tabl) )
 		$silence = new Silence($message);
 	else
 		unset($silence);
-	
+
 	// Check for mutes first, before continuing
 	$muteLink='';
 	if( $User->type['User'] ) {
@@ -399,30 +381,30 @@ while( $message = $DB->tabl_hash($tabl) )
 			$User->toggleThreadMute($message['id']);
 			$isThreadMuted = !$isThreadMuted;
 		}
-		
+
 		if( $isThreadMuted ) continue;
-		
+
 		$toggleMuteURL = 'forum.php?toggleMuteThreadID='.$message['id'].'&rand='.rand(1,99999).'#'.$message['id'];
 		$muteLink = ' <br /><a title="'.l_t('Mute this thread, hiding it from your forum and home page').'" class="light likeMessageToggleLink" href="'.$toggleMuteURL.'">'.l_t(($isThreadMuted ? 'Un-mute' : 'Mute' ).' thread').'</a>';
-		
+
 		if( $User->type['Admin'] || $User->type['ForumModerator'] ) {
-			
+
 			$muteLink .= '<br /><span class="likeMessageToggleLink">'.l_t('Silence:').' ';
-			
+
 			if( isset($silence) && $silence->isEnabled() ) {
 				$muteLink .= '<a class="light" href="admincp.php?tab=Control%20Panel&amp;silenceID='.$silence->id.'#disableSilence">'.l_t('Disable silence').'</a>';
 			}
 			else
 			{
 				$muteLink .= '<a class="light" href="admincp.php?tab=Control%20Panel&amp;postID='.$message['id'].'#createThreadSilence">'.l_t('thread').'</a>, ';
-				
+
 				$muteLink .= '<a class="light" href="admincp.php?tab=Control%20Panel&amp;postID='.$message['id'].'&amp;userID='.$message['fromUserID'].'#createUserThreadSilence">'.l_t('user').'</a>';
 			}
-			
+
 			$muteLink .= '</span>';
 		}
 	}
-	
+
 	print '<div class="hr userID'.$message['fromUserID'].' threadID'.$message['id'].'"></div>'; // Add the userID and threadID so muted users/threads dont create lines where their threads were
 
 	$switch = 3-$switch; // 1,2,1,2,1,2...
@@ -452,14 +434,14 @@ while( $message = $DB->tabl_hash($tabl) )
 			<strong><em>'.libTime::text($message['timeSent']).'</em></strong>'.$muteLink.'<br />
 			'.$User->likeMessageToggleLink($message['id'],$message['fromUserID']).libHTML::likeCount($message['likeCount']).
 		'</div>';
-	
-	
+
+
 	print '<div class="message-subject">';
 
 	print libHTML::forumMessage($message['id'],$message['latestReplySent']);
 	print libHTML::forumParticipated($message['id']);
 
-	
+
 	if ( $message['latestReplySent'] < $Misc->ThreadAliveThreshold ) {
 		$postLockedReason = l_t("Thread is too old to reply to");
 	}
@@ -475,17 +457,17 @@ while( $message = $DB->tabl_hash($tabl) )
 	{
 		unset($postLockedReason);
 	}
-	
+
 	if( isset($postLockedReason) ) {
 		print '<img src="'.l_s('images/icons/lock.png').'" title="'.$postLockedReason.'" /> ';
 	}
-	
-	
-	
+
+
+
 	print '<strong>'.$message['subject'].'</strong>';
 
 	print '</div>
-		
+
 		<div class="message-body threadalternate'.$switch.'">
 			<div class="message-contents" fromUserID="'.$message['fromUserID'].'">
 				'.$message['message'].'
@@ -506,8 +488,8 @@ while( $message = $DB->tabl_hash($tabl) )
 		// We are viewing the thread; print replies
 		$replytabl = $DB->sql_tabl(
 			"SELECT f.id, fromUserID, f.timeSent, f.message, u.points as points, IF(s.userID IS NULL,0,1) as online,
-					u.username as fromusername, f.toID, u.type as userType, 
-					f.likeCount, 
+					u.username as fromusername, f.toID, u.type as userType,
+					f.likeCount,
 					f.silenceID,
 					silence.userID as silenceUserID,
 					silence.postID as silencePostID,
@@ -532,7 +514,7 @@ while( $message = $DB->tabl_hash($tabl) )
 			$replyID = $reply['id'];
 
 			$replyswitch = 3-$replyswitch;//1,2,1,2,1...
-			
+
 			print '<div class="reply replyborder'.$replyswitch.' replyalternate'.$replyswitch.'
 				'.($replyNumber ? '' : 'reply-top').' userID'.$reply['fromUserID'].'">';
 			$replyNumber++;
@@ -567,24 +549,24 @@ while( $message = $DB->tabl_hash($tabl) )
 			print '<em>'.libTime::text($reply['timeSent']).'</em>';
 
 			print '<br />'.$User->likeMessageToggleLink($reply['id'],$reply['fromUserID']).libHTML::likeCount($reply['likeCount']);
-			
-			
+
+
 			if( $User->type['Admin'] || $User->type['ForumModerator'] ) {
-				
+
 				if( Silence::isSilenced($reply) )
 					$silence = new Silence($reply);
 				else
 					unset($silence);
-				
+
 				print '<br />';
-				
-				if( isset($silence) && $silence->isEnabled() ) 
+
+				if( isset($silence) && $silence->isEnabled() )
 					print '<a class="light likeMessageToggleLink" href="admincp.php?tab=Control%20Panel&amp;silenceID='.$silence->id.'#disableSilence">'.l_t('Disable silence').'</a>';
 				else
 					print '<a class="light likeMessageToggleLink" href="admincp.php?tab=Control%20Panel&amp;postID='.$reply['id'].'&amp;userID='.$reply['fromUserID'].'#createUserThreadSilence">'.l_t('Silence user').'</a>';
-				
+
 			}
-					
+
 			print '</div>';
 
 

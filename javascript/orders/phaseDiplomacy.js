@@ -1,33 +1,16 @@
-/*
-    Copyright (C) 2004-2010 Kestas J. Kuliukas
-	
-	This file is part of webDiplomacy.
 
-    webDiplomacy is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    webDiplomacy is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with webDiplomacy.  If not, see <http://www.gnu.org/licenses/>.
- */
 // See doc/javascript.txt for information on JavaScript in webDiplomacy
 
 function loadOrdersPhase() {
 	MyOrders.map(function(OrderObj) {
 
 			OrderObj.convoyPath=$A([ ]);
-			
+
 			OrderObj.postUpdate=function() {
 				// We may need to generate the convoy path to help the server-side order validator
-				
+
 				var convoyPath = $A([ ]);
-				
+
 				if( this.isComplete && !Object.isUndefined(this.Unit.convoyOptions) )
 				{
 					if( this.type=='Move' && this.Unit.convoyOptions.any(function(c){ return (c==this.toTerrID); },this) )
@@ -54,25 +37,25 @@ function loadOrdersPhase() {
 							this.wipe(['toTerrID','fromTerrID']);
 					}
 				}
-				
+
 				this.convoyPath = convoyPath;
-				
-				
+
+
 				/*
 				 * Now we need to perform auto-fill functionality, if it is enabled
 				 * (it may be disabled for DATC tests)
-				 */  
+				 */
 				if( false && this.autoFill ) {
-					
+
 					var thisOrder=this;
 					var filterSet=function(fFilter,fSet) { MyOrders.select(fFilter).map(fSet); };
-					
+
 					if( Object.isUndefined(this.setAndShow) ) {
-						MyOrders.map(function(o){ 
+						MyOrders.map(function(o){
 							o.setAndShow=function(n,v){ o.inputValue(n,v); o.reHTML(n); };
 						});
 					}
-					
+
 					switch( this.type ) {
 						case "Support hold":
 							if( this.isComplete ) {
@@ -83,44 +66,44 @@ function loadOrdersPhase() {
 								});
 							}
 							break;
-							
+
 						case "Support move":
 							if( !Object.isUndefined(this.ToTerritory) ) {
 								// We have toTerr, where we are supporting to
 
-								MyOrders.select(function(o) { 
+								MyOrders.select(function(o) {
 									return( o.Unit.Territory.id==thisOrder.ToTerritory.id && o.type!='Move' );
 								}).map(function(o){
 									o.setAndShow('type','Move');
 								});
 							}
-							
+
 							if( !Object.isUndefined(this.FromTerritory) ) {
 								// We have fromTerr, where we are supporting from
 
 								MyOrders.map(function(o) {
-									var convoyingArmyList=MyOrders.select(function(o) { 
+									var convoyingArmyList=MyOrders.select(function(o) {
 										return( o.Unit.Territory.id==thisOrder.FromTerritory.id );
 									});
-									
+
 									convoyingArmyList.map(function(o){
 										o.setAndShow('type','Move');
 									});
-									
-									convoyingArmyList.select(function(o) { 
+
+									convoyingArmyList.select(function(o) {
 										return( Object.isUndefined(o.ToTerritory)||o.ToTerritory.id!=thisOrder.ToTerritory.id );
 									}).map(function(o){
 										o.setAndShow('toTerrID',thisOrder.ToTerritory.id.toString());
 									});
 								},this);
 							}
-							
+
 							break;
-						
+
 						case "Convoy":
 							if( !Object.isUndefined(this.ToTerritory) ) {
 								// We have toTerr, where we are convoying to
-								
+
 								// If it's one of ours it had better move (had it?)
 								MyOrders.select(function(o) {
 									return ( o.Unit.Territory.id==thisOrder.ToTerritory.id && o.type!='Move' );
@@ -128,7 +111,7 @@ function loadOrdersPhase() {
 									setVal(o,'type','Move');
 								});
 							}
-							
+
 							if( !Object.isUndefined(this.FromTerritory) ) {
 								// We have fromTerr, where we are convoying from
 
@@ -145,13 +128,13 @@ function loadOrdersPhase() {
 					}
 				}
 			};
-			
+
 			OrderObj.updaterequirements = function () {
-			
+
 				var oldrequirements = this.requirements;
-				
+
 				switch( this.type ) {
-					case 'Move': 
+					case 'Move':
 						this.requirements = [ 'type','toTerrID','viaConvoy' ];
 						break;
 					case 'Support hold':
@@ -164,29 +147,29 @@ function loadOrdersPhase() {
 						this.requirements = [ 'type','toTerrID','fromTerrID' ];
 						break;
 					default:
-						this.requirements = ['type']; 
+						this.requirements = ['type'];
 				}
-				
+
 				this.wipe(oldrequirements.reject(function(r){return this.requirements.member(r);},this));
-				
+
 			};
-			
+
 			OrderObj.updateTypeChoices = function () {
 				this.typeChoices = {
 					'Hold': l_t('hold'), 'Move': l_t('move'), 'Support hold': l_t('support hold'), 'Support move': l_t('support move')
 				};
-				
+
 				if( this.Unit.type == 'Fleet' && this.Unit.Territory.type == 'Sea' )
 					this.typeChoices['Convoy']=l_t('convoy');
-				
+
 				return this.typeChoices;
 			};
-			
+
 			OrderObj.updateToTerrChoices = function () {
 				switch( this.type ) {
-					case 'Move': 
+					case 'Move':
 						this.toTerrChoices = this.Unit.getMoveChoices();
-						
+
 						if( this.Unit.type=='Army' && this.Unit.Territory.type=='Coast' )
 						{
 							var ttac = new Hash();
@@ -200,7 +183,7 @@ function loadOrdersPhase() {
 									}
 								);
 							this.toTerrChoices = ttac;
-							
+
 							return this.toTerrChoices;
 						}
 						break;
@@ -209,12 +192,12 @@ function loadOrdersPhase() {
 					case 'Convoy': this.toTerrChoices = this.Unit.getConvoyToChoices(); break;
 					default: this.toTerrChoices = undefined; return;
 				}
-				
+
 				this.toTerrChoices=this.arrayToChoices(this.toTerrChoices);
-				
+
 				return this.toTerrChoices;
 			};
-			
+
 			OrderObj.updateFromTerrChoices = function () {
 				if( Object.isUndefined(this.ToTerritory) )
 				{
@@ -228,12 +211,12 @@ function loadOrdersPhase() {
 						default: this.fromTerrChoices = undefined; return;
 					}
 				}
-				
+
 				this.fromTerrChoices=this.arrayToChoices(this.fromTerrChoices);
-				
+
 				return this.fromTerrChoices;
 			};
-			
+
 			OrderObj.updateViaConvoyChoices = function () {
 				if( this.type!='Move' || this.toTerrID=='' )
 					this.viaConvoyChoices=undefined;
@@ -243,10 +226,10 @@ function loadOrdersPhase() {
 					this.viaConvoyChoices=new Hash({'Yes': l_t('via convoy'), 'No': l_t('via land')});
 				else
 					this.viaConvoyChoices=new Hash({'Yes': l_t('via convoy')});
-				
+
 				return this.viaConvoyChoices;
 			};
-			
+
 			OrderObj.beginHTML = function () {
 				return l_t('The %s at %s',l_t(this.Unit.type.toLowerCase()),l_t(this.Unit.Territory.name))+' ';
 			};
@@ -255,15 +238,15 @@ function loadOrdersPhase() {
 			};
 			OrderObj.toTerrHTML = function () {
 				var toTerrID=this.formDropDown('toTerrID',this.toTerrChoices,this.toTerrID);
-				
+
 				if( toTerrID == '' ) return '';
-				
+
 				var ToUnitType;
 				if( Object.isUndefined(this.ToTerritory) || Object.isUndefined(this.ToTerritory.Unit) )
 					ToUnitType = 'unit';
 				else
 					ToUnitType = this.ToTerritory.Unit.type.toLowerCase();
-					
+
 				switch(this.type) {
 					// toTerrID is retrieved from the list of choices, so is already translated
 					case 'Move': return l_t(' to %s ',toTerrID);
@@ -275,9 +258,9 @@ function loadOrdersPhase() {
 			};
 			OrderObj.fromTerrHTML = function () {
 				if( this.toTerrID == '' ) return '';
-				
+
 				var fromTerrID=this.formDropDown('fromTerrID',this.fromTerrChoices,this.fromTerrID);
-					
+
 				switch(this.type) {
 					case 'Support move': return l_t(' from %s ',fromTerrID);
 					case 'Convoy': return l_t(' from %s ',fromTerrID);
@@ -292,7 +275,7 @@ function loadOrdersPhase() {
 				else
 					return this.formDropDown('viaConvoy',this.viaConvoyChoices,this.viaConvoy);
 			};
-			
+
 			OrderObj.load();
 		});
 }

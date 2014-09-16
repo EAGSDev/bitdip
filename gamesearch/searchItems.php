@@ -1,22 +1,5 @@
 <?php
-/*
-    Copyright (C) 2004-2010 Kestas J. Kuliukas
-	
-	This file is part of webDiplomacy.
 
-    webDiplomacy is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    webDiplomacy is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with webDiplomacy.  If not, see <http://www.gnu.org/licenses/>.
- */
 
 defined('IN_CODE') or die('This script can not be run by itself.');
 
@@ -26,53 +9,53 @@ defined('IN_CODE') or die('This script can not be run by itself.');
  */
 
 /**
- * While the searchItem/searchObject setup seems needlessly complex if 
- * you need something simple and/or unchanging, it makes things much 
+ * While the searchItem/searchObject setup seems needlessly complex if
+ * you need something simple and/or unchanging, it makes things much
  * more managable and flexible as things get more complex.
  * As it is it's easy to add new search criteria, or add more qualifiers
- * to a certain subset of searches, or to add more standard searches, 
+ * to a certain subset of searches, or to add more standard searches,
  * and it can be searched by a human or used by the system as a way to
- * find games meeting certain criteria. (Or even used for users or 
+ * find games meeting certain criteria. (Or even used for users or
  * multi-account detection, etc)
- * 
- * 
+ *
+ *
  * A search item represents something that gives you some choice/some way of
- * defining a search. It can display this choice as an HTML form widget, 
- * can recognize a submitted choice via the form, and can convert this 
+ * defining a search. It can display this choice as an HTML form widget,
+ * can recognize a submitted choice via the form, and can convert this
  * submitted choice into SQL which affects the resulting search.
- * 
- * In addition it also has to recognize default settings. For a given 
- * template a search item must be able to default to a certain choice, 
+ *
+ * In addition it also has to recognize default settings. For a given
+ * template a search item must be able to default to a certain choice,
  * or even enforce that choice and not allow alternatives.
- * 
- * Finally an item may have sub-items, which are affected by form inputs 
- * and can alter the search SQL only if a certain choice is made in the 
- * parent item. 
- * 
- * 
+ *
+ * Finally an item may have sub-items, which are affected by form inputs
+ * and can alter the search SQL only if a certain choice is made in the
+ * parent item.
+ *
+ *
  * The whole thing goes like this:
  * setOptions - Convert the array of option names to searchOption objects
  * setSubItems - Convert the array of sub-item names to searchItem objects
  * 		(This repeats this whole process for each sub-item)
  * setDefaults - Set the options and value to their defaults for the given search-template
  * setLocked - Set the options to locked depending on the given search-template
- * 
+ *
  * Then the item is set up and ready.
- * 
+ *
  * == This code is run if dealing with a user search from a form, otherwise it's skipped
  * == filterInput - Check any form input data to see if there's a valid option that is being set
  * == 		(This returns all the sub-items which may also need to take form input data)
- * == 
- * == Once this is done for all items the HTML form is printed off 
+ * ==
+ * == Once this is done for all items the HTML form is printed off
  * == formHTML - Print the HTML
  * == 		(This returns a string which will also contain the formHTML for all sub-items)
- * == 
+ * ==
  * == Once the HTML is all out the SQL is generated
- * 
- * 
+ *
+ *
  * sql - Get the SQL for this item, adding it to what's given
  * 		(This returns all the sub-items which may also need to alter the search SQL)
- * 
+ *
  * Then the SQL is finished and the query can be executed.
  */
 abstract class searchItem
@@ -82,13 +65,13 @@ abstract class searchItem
 	 * @var string
 	 */
 	public $name;
-	
+
 	/**
 	 * The friendly label for this item (e.g. 'Game membership filters')
 	 * @var string
 	 */
 	protected $label;
-	
+
 	/**
 	 * The list of options, indexed by HTML form value, the array value is the label for that option.
 	 * The first value is the default if no other is specified. All strings are replaced with searchOption
@@ -97,33 +80,33 @@ abstract class searchItem
 	 * @var array
 	 */
 	protected $options;
-	
+
 	/**
 	 * Is this item unchangeable?
 	 * @var boolean
 	 */
 	protected $locked=false;
-	
+
 	/**
-	 * The selected option value 
+	 * The selected option value
 	 * @var string
 	 */
 	protected $value;
-	
+
 	/**
 	 * The list of search templates in which this item cannot change its value
 	 * (e.g. array('My games','Profile') )
 	 * @var array
 	 */
 	protected $locks=array();
-	
+
 	/**
-	 * An array of default values indexed by search-template. 
+	 * An array of default values indexed by search-template.
 	 * (e.g. array( 'Notifications'=>'Yes', 'Profile'=>'Yes', 'My games'=>'Yes', 'New'=>'No', 'Joinable'=>'No', 'Active'=>'No' ) )
 	 * @var unknown_type
 	 */
 	protected $defaults=array();
-	
+
 	/**
 	 * The array of sub-item object postfix names this item may refer to depending on its selection
 	 * (e.g. array('MemberStatus','ActivityTypes','IsJoinable') ). Replaced with their respective searchItem
@@ -131,10 +114,10 @@ abstract class searchItem
 	 * @var array
 	 */
 	protected $subItems=array();
-	
-	
+
+
 	abstract function sql(&$TABLES,&$WHERE,&$ORDER);
-	
+
 	function __construct($searchType)
 	{
 		$this->setOptions();
@@ -174,25 +157,25 @@ abstract class searchItem
 		{
 			foreach($this->options as $option)
 				$option->locked=true;
-			
+
 			$this->locked=true;
 		}
 	}
-	
+
 	protected function setValue($value)
 	{
 		if(isset($this->value))
 			foreach($this->options as $option)
 				$option->checked = false;
-		
+
 		$this->value = $value;
 		$this->options[$this->value]->checked = true;
 	}
-	
+
 	function filterInput($input)
 	{
 		if ( $this->locked ) return;
-		
+
 		foreach($this->options as $value=>$option)
 			if( $input === $value )
 			{
@@ -200,17 +183,17 @@ abstract class searchItem
 				break;
 			}
 	}
-	
+
 	function formHTML()
 	{
 		$formHTML='<li>';
-		
+
 		if($this->label)
 			$formHTML .= '<strong>'.l_t($this->label).':</strong>';
-		
+
 		foreach($this->options as $option)
 			$formHTML .= $option->formHTML().' ';
-		
+
 		return $formHTML.'</li>';
 	}
 }
@@ -224,18 +207,18 @@ abstract class searchItemSelect extends searchItem
 			$optionObj = new searchOptionSelect('search['.$this->name.']', $label, $value);
 			$options[$optionObj->value] = $optionObj;
 		}
-			
+
 		$this->options = $options;
 	}
-	
+
 	function formHTML()
 	{
 		$formHTML='';
 		foreach($this->options as $option)
 			$formHTML .= $option->formHTML().' ';
-			
+
 		return '<li><strong>'.
-			l_t($this->label).':</strong> 
+			l_t($this->label).':</strong>
 			<select name="search['.$this->name.']">'.
 			$formHTML.
 			'</select>
@@ -254,7 +237,7 @@ abstract class searchItemCheckbox extends searchItem
 		}
 		return $invertedChecks;
 	}
-	
+
 	protected function setOptions()
 	{
 		foreach($this->options as $value=>$label)
@@ -262,10 +245,10 @@ abstract class searchItemCheckbox extends searchItem
 			$optionObj = new searchOptionCheckbox('search['.$this->name.']', $label, $value);
 			$options[$optionObj->value] = $optionObj;
 		}
-			
+
 		$this->options = $options;
 	}
-	
+
 	protected function setValue($values)
 	{
 		assert('is_array($values)');
@@ -274,10 +257,10 @@ abstract class searchItemCheckbox extends searchItem
 				$option->checked=true;
 			else
 				$option->checked=false;
-		
+
 		$this->value=$values;
 	}
-	
+
 	protected function setDefaults($searchType)
 	{
 		if ( isset($this->defaults[$searchType]) )
@@ -285,21 +268,21 @@ abstract class searchItemCheckbox extends searchItem
 		else
 		{
 			$values=array();
-			
+
 			foreach($this->options as $option)
 				$values[]=$option->value;
-			
+
 			$this->setValue($values);
 		}
 	}
-	
+
 	function filterInput($input)
 	{
 		assert('is_array($input)');
 		if ( $this->locked ) return;
-		
+
 		$values=array();
-		
+
 		foreach($input as $selectedOption)
 		{
 			if( isset($this->options[$selectedOption]) )
@@ -308,7 +291,7 @@ abstract class searchItemCheckbox extends searchItem
 				$values[]=$this->options[$selectedOption]->value;
 			}
 		}
-		
+
 		$this->setValue($values);
 	}
 }
@@ -321,7 +304,7 @@ abstract class searchItemRadio extends searchItem
 			$optionObj = new searchOptionRadio('search['.$this->name.']', $label, $value);
 			$options[$optionObj->value] = $optionObj;
 		}
-			
+
 		$this->options = $options;
 	}
 }

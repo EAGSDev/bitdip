@@ -1,22 +1,5 @@
 <?php
-/*
-    Copyright (C) 2004-2010 Kestas J. Kuliukas
 
-	This file is part of webDiplomacy.
-
-    webDiplomacy is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    webDiplomacy is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with webDiplomacy.  If not, see <http://www.gnu.org/licenses/>.
- */
 
 defined('IN_CODE') or die('This script can not be run by itself.');
 /**
@@ -80,10 +63,10 @@ class adjudicatorPreGame {
 
 		$userIDs = array();
 		foreach($Game->Members->ByID as $M) $userIDs[]=$M->userID;
-		
+
 		$chanceGrid = $this->getUserCountryChances($userIDs);
 		$userChances = $chanceGrid;
-		
+
 		/*
 		 * - Order the players so that the player which has the most difference in their
 		 * 	 chances from countryID to countryID gets to draw first. (So that large differences
@@ -168,18 +151,18 @@ class adjudicatorPreGame {
 			$userChances[$userID][$countryID] /= 2.0;
 			$userChances[$userID]=$this->balanceChances($userChances[$userID]);
 		}
-		
+
 		$this->setUserCountryChances($userChances);
 
 		return $userCountries;
 	}
-	
+
 	protected function setUserCountryChances($countryChances)
 	{
 		global $Game;
 		$vd = new VariantData($Game->variantID);
 		$vd->systemToken = 948379409;
-		
+
 		foreach($countryChances as $userID=>$chances)
 		{
 			$vd->userID = $userID;
@@ -187,25 +170,25 @@ class adjudicatorPreGame {
 				$vd->setFloat($chance, $countryID);
 		}
 	}
-	
+
 	protected function getUserCountryChances($userIDs)
 	{
 		global $Game;
 		$vd = new VariantData($Game->variantID);
 		$vd->systemToken = 948379409;
-		
+
 		$countryChances = array();
-		
+
 		$countryCount = count($Game->Variant->countries);
 		foreach($userIDs as $userID)
 		{
 			$countryChances[$userID] = array();
-			
+
 			$vd->userID = $userID;
 			for($countryID=1;$countryID<=$countryCount;$countryID++)
 				$countryChances[$userID][$countryID] = $vd->getFloat($countryID, 1.0/$countryCount);
 		}
-		
+
 		return $countryChances;
 	}
 

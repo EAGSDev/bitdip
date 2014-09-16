@@ -1,22 +1,4 @@
 <?php
-/*
-    Copyright (C) 2004-2010 Kestas J. Kuliukas
-
-	This file is part of webDiplomacy.
-
-    webDiplomacy is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    webDiplomacy is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with webDiplomacy.  If not, see <http://www.gnu.org/licenses/>.
- */
 
 defined('IN_CODE') or die('This script can not be run by itself.');
 
@@ -46,12 +28,12 @@ if ( isset($_REQUEST['aUserID']) and $_REQUEST['aUserID'] )
 		}
 
 		$m->printCheckSummary();
-		
+
 		$m->aLogsDataCollect();
 
 		if ( !is_array($m->bUserIDs) )
 			$m->findbUserIDs();
-		
+
 		if ( ! $m->bUserIDs )
 		{
 			print '<p>'.l_t('This account has no links with other accounts').'</p>';
@@ -61,7 +43,7 @@ if ( isset($_REQUEST['aUserID']) and $_REQUEST['aUserID'] )
 			if( isset($_REQUEST['showHistory']) )
 			{
 				$m->printUserTimeprint();
-				
+
 				$m->timeData();
 			}
 			else
@@ -643,20 +625,20 @@ class adminMultiCheck
 	private function compareGames($name, $bUserID, $gameIDs)
 	{
 		global $DB;
-		
+
 		$matches = self::sql_list(
 			"SELECT DISTINCT gameID
 			FROM wD_Members
 			WHERE userID = ".$bUserID." AND gameID IN ( ".implode(',',$gameIDs)." )"
 		);
-		
+
 		$privateMatches = array();
 		if(count($matches) > 0)
 		{
 			$tabl = $DB->sql_tabl("SELECT id FROM wD_Games WHERE NOT password IS NULL AND id IN (".implode(',',$matches).")");
 			while(list($id)=$DB->tabl_row($tabl)) $privateMatches[] = $id;
 		}
-		
+
 		$linkMatches = array();
 		foreach($matches as $match)
 			$linkMatches[] = '<a href="board.php?gameID='.$match.'" class="light">'.$match.(in_array($match,$privateMatches)?' (Private)':'').'</a>';
@@ -687,7 +669,7 @@ class adminMultiCheck
 		$this->compareIPData($bUser->id, $bUserTotal);
 		$this->compareCookieCodeData($bUser->id, $bUserTotal);
 		$this->compareUserAgentData($bUser->id, $bUserTotal);
-		
+
 		if ( count($this->aLogsData['fullGameIDs']) > 0 )
 			$this->compareGames('All games', $bUser->id, $this->aLogsData['fullGameIDs']);
 
@@ -696,91 +678,91 @@ class adminMultiCheck
 
 		print '</ul></li></ul>';
 	}
-	
+
 	/**
 	 * Get the time data for a userID
-	 * 
+	 *
 	 * @param int $userID The userID to load data for
 	 * @return array[int][int] $array[$day][$hour] = % of hits in that time period, from 0 to 1. $day is 1 to 7, $hour is 0 to 23
 	 */
 	private function timeprintLoad($userID) {
 		global $DB;
-	
+
 		$userID = (int)$userID;
-	
+
 		$tabl = $DB->sql_tabl("SELECT day, hour, SUM(hits) as hits FROM (SELECT userID, hits, DAYOFWEEK(lastRequest) as day, HOUR(lastRequest) as hour FROM wD_AccessLog WHERE userID=".$userID.") as a GROUP BY day, hour");
-	
+
 		$result = $this->timeprintBlank();
-		
+
 		while ( list($day, $hour, $hits) = $DB->tabl_row($tabl) )
 			$result[$day][$hour] = $hits;
-	
+
 		return $this->timeprintReduce($result);
 	}
-	
+
 	/**
 	 * Get a blank timeprint array
 	 * @return array[int][int] $array[$day][$hour] = An array of 0s. $day is 1 to 7, $hour is 0 to 23
 	 */
 	private function timeprintBlank() {
-		
+
 		$result = array();
-		
+
 		for($day=1; $day<=7; $day++) {
 			$result[$day] = array();
 			for($hour=0; $hour<24; $hour++)
 				$result[$day][$hour] = 0;
 		}
-		
+
 		return $result;
 	}
-	
+
 	private function timeprintSum(array $weekData) {
-		
+
 		// Sum it all up
 		$sum=0;
 		foreach($weekData as $day=>$dayData)
 			foreach($dayData as $hour=>$value)
 				$sum += $value;
-		
+
 		return $sum;
 	}
-	
+
 	/**
 	 * For each cell in the timeprint array get the % of that cell that is the total, so that the whole contents of the array adds up to 1.
-	 * 
+	 *
 	 * @return array[int][int] $array[$day][$hour] = An array of 0-1 values which adds up to 1, (or 0 if it was 0 before). $day is 1 to 7, $hour is 0 to 23
 	 */
 	private function timeprintReduce(array $weekData) {
-		
+
 		$result = $this->timeprintBlank();
-		
+
 		// Sum it all up
 		$sum=$this->timeprintSum($weekData);
-		
+
 		// Divide it all by the sum
 		if( $sum > 0 )
 			foreach($weekData as $day=>$dayData)
 				foreach($dayData as $hour=>$value)
 					$result[$day][$hour] = $value / $sum;
-		
+
 		return $result;
 	}
-	
+
 	/**
 	 * Multiply two timeData arrays together, getting a result which gives an indication of time overlaps.
-	 * 
+	 *
 	 * If one of the two weeks has no data the one which does have data will be returned.
-	 * 
+	 *
 	 * @param array $weekDataA
 	 * @param array $weekDataB
-	 * 
+	 *
 	 * @return array[int][int] $array[$day][$hour] = An array of 0-1 values which adds up to 1, (or 0 if it was 0 before). $day is 1 to 7, $hour is 0 to 23
 	 */
 	private function timeprintMerge(array $weekDataA, array $weekDataB) {
 		$weekDataA = $this->timeprintReduce($weekDataA);
 		$weekDataB = $this->timeprintReduce($weekDataB);
-		
+
 		if( $this->timeprintSum($weekDataA) == 0 )
 			return $weekDataB;
 		elseif( $this->timeprintSum($weekDataB) == 0 )
@@ -788,15 +770,15 @@ class adminMultiCheck
 		else
 		{
 			$weekDataC = $this->timeprintBlank();
-			
+
 			foreach($weekDataA as $day=>$hourDataA)
 				foreach($hourDataA as $hour=>$valueA)
 					$weekDataC[$day][$hour] = $valueA * $weekDataB[$day][$hour];
-			
+
 			return $this->timeprintReduce($weekDataC);
 		}
 	}
-	
+
 	public function printUserTimeprint() {
 		print '<style>
 		.timeprintData table {
@@ -822,44 +804,44 @@ class adminMultiCheck
 			text-align:center;
 		}
 		</style>';
-		
+
 		print '<div class="timeprintData" style="font-size:80%"><h3>'.l_t('Timeprint data:').'</h3>';
-		
+
 		$timeprints = array();
-		
+
 		$timeprint = $this->timeprintLoad($this->aUserID);
 		$timeprints[] = $timeprint;
-		
+
 		print '<h4>'.l_t('User # '.$this->aUserID.':').'</h4>'.$this->printTimeprint($timeprint);
-		
+
 		if(count($this->bUserIDs) > 0 ) {
 			foreach($this->bUserIDs as $bUserID) {
 				$timeprint = $this->timeprintLoad($bUserID);
 				$timeprints[] = $timeprint;
 				print '<h4>'.l_t('User # '.$bUserID.':').'</h4>'.$this->printTimeprint($timeprint);
 			}
-			
+
 			print '<h4>'.l_t('Comparison timeprint:').'</h4>';
 			$timeprintComparison = $this->timeprintBlank();
 			foreach($timeprints as $timeprint)
 				$timeprintComparison = $this->timeprintMerge($timeprintComparison, $timeprint);
-			
+
 			print $this->printTimeprint($timeprintComparison);
 		}
-		
+
 		print '<div class="hr"></div>';
-		
+
 		print '</div>';
 	}
-	
+
 	private function printTimeprint(array $weekData) {
 		$buf = '<table>';
-		
+
 		$buf .= '<tr><th><strong>'.l_t('Hour:').'</strong></th>';
 		for($i=0;$i<24;$i++)
 			$buf .= '<th>'.$i.'</th>';
 		$buf .= '</tr>';
-		
+
 		foreach( $weekData as $day=>$hourData) {
 			switch($day) {
 				case 1: $day = 'Mon'; break;
@@ -875,14 +857,14 @@ class adminMultiCheck
 				$value = round($value * 100).'%';
 				if( $value == 0 )
 					$value = '&nbsp;';
-				
+
 				$buf .= '<td>'.$value.'</td>';
 			}
 			$buf .= '</tr>';
 		}
-		
+
 		$buf .= '</table>';
-		
+
 		return $buf;
 	}
 }

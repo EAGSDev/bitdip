@@ -1,21 +1,4 @@
-/*
-    Copyright (C) 2004-2010 Kestas J. Kuliukas
 
-	This file is part of webDiplomacy.
-
-    webDiplomacy is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    webDiplomacy is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with webDiplomacy.  If not, see <http://www.gnu.org/licenses/>.
- */
 // See doc/javascript.txt for information on JavaScript in webDiplomacy
 
 /*
@@ -39,21 +22,21 @@ function dateToText(date) {
 	if( secondDifference < 0 ) secondDifference *= -1;
 
 	var a = l_t(dayNames[date.getDay()]);
-	
+
 	if ( secondDifference < 4*24*60*60 )
 	{
 		var I = date.getHours();
 		var M = date.getMinutes();
 		if( M<10 ) M="0"+M;
-	
+
 		var p = "AM";
 		if( I >= 12 ) {
 			I -= 12;
 			p = "PM";
 		}
-		
+
 		if( I==0 ) I="12";
-		
+
 		// apply leading zero to single digit hour
 		if( I<10 ) I="0"+I.toString();
 
@@ -68,12 +51,12 @@ function dateToText(date) {
 		var b = l_t(monthNames[date.getMonth()]);
 		var y = date.getYear();
 		if ( y < 1900 ) y+=1900;
-		
+
 		if ( secondDifference < 3*7*22*60*60 ) // within 19 days, 6 hours
 			return a+" "+d+" "+b; // Day Day# Month
 		else
 			return d+" "+b+" "+y; // Day# Month Year
-	} 
+	}
 }
 
 // Update the timezone offset info in the footer, which tells the user which timezone the page's times are in
@@ -86,13 +69,13 @@ function updateUTCOffset() {
 		UTCHoursOffset *= -1;
 		sign='-';
 	}
-	
+
 	var hours = Math.floor(UTCHoursOffset);
 	var minutes = (UTCHoursOffset*60 - hours*60);
-	
+
 	if( hours < 10 ) hours = '0'+hours.toString();
 	if( minutes < 10 ) minutes = '0'+minutes.toString();
-	
+
 	var utcE = $("UTCOffset");
 	if( !Object.isUndefined(utcE) && utcE != null )
 		utcE.update('UTC'+sign.toString()+hours.toString()+':'+minutes.toString());
@@ -107,29 +90,29 @@ var newTimerCheckMinTime=7*24*60*60; // The new refresh time, to detect when it 
 
 // Update countdown timers, needs to be run repeatedly. The first time it is run it will set up future runs
 function updateTimers() {
-	
+
 	var timeFrom = Math.floor((new Date).getTime() / 1000);
-	
+
 	$$(".gameTimeRemaining .timeremaining").map(function(c) {
-		
+
 		var givenTime = parseInt(c.getAttribute("unixtime"));
 		var secondsRemaining = givenTime - timeFrom;
 
 		if( secondsRemaining < 300 )
 			c.setStyle({'color': '#a00'});
-		
+
 		c.update(remainingText(secondsRemaining));
-		
+
 	},this);
-	
+
 	// If the timer interval has changed update it
 	if( newTimerCheckMinTime != timerCheckMinTime )
 	{
 		timerCheckMinTime = newTimerCheckMinTime;
-		
+
 		if( typeof timerCheck == "object" )
 			timerCheck.stop();
-		
+
 		timerCheck = new PeriodicalExecuter(updateTimers, timerCheckMinTime);
 	}
 }
@@ -137,7 +120,7 @@ function updateTimers() {
 // Update the timer update period, if 1 the countdowns are updated every second. The smallest update period has to be used
 function setMinimumTimerInterval(newInterval) {
 	if( newInterval<1.0 ) newInterval=1;
-	
+
 	if( newTimerCheckMinTime >= newInterval )
 		newTimerCheckMinTime = newInterval;
 }
@@ -171,7 +154,7 @@ function remainingText(secondsRemaining)
 	else if ( hours > 0 ) // H, M
 	{
 		minutes += Math.round(seconds/60); // Add a minute if the seconds almost give a minute)
-		
+
 		if ( hours < 4 )
 		{
 			setMinimumTimerInterval(seconds);
@@ -180,9 +163,9 @@ function remainingText(secondsRemaining)
 		else
 		{
 			setMinimumTimerInterval(minutes*60);
-			
+
 			hours += Math.round(minutes/60); // Add an hour if the minutes almost gives an hour
-			
+
 			return l_t('%s hours', hours);
 		}
 	}
@@ -196,7 +179,7 @@ function remainingText(secondsRemaining)
 		else
 		{
 			setMinimumTimerInterval(1);
-			
+
 			if( minutes > 1 )
 				return l_t('%s mins, %s secs',minutes,seconds);
 			else if ( minutes > 0 )

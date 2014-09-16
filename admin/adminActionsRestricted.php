@@ -1,28 +1,11 @@
 <?php
-/*
-    Copyright (C) 2004-2010 Kestas J. Kuliukas
 
-	This file is part of webDiplomacy.
-
-    webDiplomacy is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    webDiplomacy is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with webDiplomacy.  If not, see <http://www.gnu.org/licenses/>.
- */
 
 defined('IN_CODE') or die('This script can not be run by itself.');
 
 /**
- * This class will enable adminActions and adminActionsForum moderator 
- * tasks to be performed, but also allow tasks which only admins should 
+ * This class will enable adminActions and adminActionsForum moderator
+ * tasks to be performed, but also allow tasks which only admins should
  * be able to perform.
  * This will be included anyway, but the class will only be initialized if
  * the user is an admin.
@@ -134,13 +117,13 @@ class adminActionsRestricted extends adminActionsForum
 			'recreateUnitDestroyIndex' => array(
 				'name' => 'Recreate the destroy unit indexes',
 				'description' => 'Refreshes the unit destroy indexes for a certain map ID. This will generally only
-					be run if there has been a bug found in the unit destroy index generation code which requires 
+					be run if there has been a bug found in the unit destroy index generation code which requires
 					the indexes to be recreated.<br />
 					Note that this uses the generic installation code, so if there are any variant-specific modifications
 					running this may give unpredictable results. Please confirm with the variant maintainer before
 					using this admin action.',
 				'params' => array('mapID'=>'Map ID'),
-			)		
+			)
 		);
 
 		adminActions::$actions = array_merge(adminActions::$actions, $restrictedActions);
@@ -165,7 +148,7 @@ class adminActionsRestricted extends adminActionsForum
 	public function backupGame(array $params)
 	{
 		global $DB;
-		
+
 		require_once(l_r('objects/game.php'));
 
 		$gameID = (int)$params['gameID'];
@@ -179,7 +162,7 @@ class adminActionsRestricted extends adminActionsForum
 	public function restoreGameConfirm(array $params)
 	{
 		global $DB;
-		
+
 		require_once(l_r('objects/game.php'));
 		$Variant=libVariant::loadFromGameID($params['gameID']);
 		$Game = $Variant->Game($params['gameID']);
@@ -189,7 +172,7 @@ class adminActionsRestricted extends adminActionsForum
 	public function restoreGame(array $params)
 	{
 		global $DB;
-		
+
 		require_once(l_r('gamemaster/game.php'));
 
 		$gameID = (int)$params['gameID'];
@@ -207,7 +190,7 @@ class adminActionsRestricted extends adminActionsForum
 	public function wipeBackups(array $params)
 	{
 		global $DB;
-		
+
 		require_once(l_r('gamemaster/game.php'));
 
 		processGame::wipeBackups();
@@ -493,7 +476,7 @@ class adminActionsRestricted extends adminActionsForum
 		 * - Remove the invalid maps in the mapstore
 		 */
 		$DB->sql_put("BEGIN");
-		
+
 		require_once(l_r('gamemaster/game.php'));
 		$Variant=libVariant::loadFromGameID($gameID);
 		$Game = $Variant->processGame($gameID);
@@ -570,32 +553,32 @@ class adminActionsRestricted extends adminActionsForum
 		return l_t('This game was moved from %s, %s back to Diplomacy, %s, and is ready to be reprocessed.',
 			$oldPhase,$Game->datetxt($oldTurn),$Game->datetxt($lastTurn));
 	}
-	
+
 	public function recreateUnitDestroyIndex(array $params)
 	{
 		global $DB;
-		
+
 		$mapID = (int)$params['mapID'];
-		
+
 		require_once("variants/install.php");
-		
+
 		InstallTerritory::loadExistingTerritories($mapID);
-		
+
 		// Generate the SQL before wiping & reinserting it
 		$unitDestroyIndexRecreateSQL = InstallTerritory::unitDestroyIndexSQL($mapID);
-		
+
 		$DB->sql_put("BEGIN");
-		
+
 		list($entriesBefore) = $DB->sql_row("SELECT COUNT(*) FROM wD_UnitDestroyIndex WHERE mapID = ".$mapID);
-		
+
  		$DB->sql_put("DELETE FROM wD_UnitDestroyIndex WHERE mapID = ".$mapID);
- 		
+
  		$DB->sql_put($unitDestroyIndexRecreateSQL);
- 		
+
  		list($entriesAfter) = $DB->sql_row("SELECT COUNT(*) FROM wD_UnitDestroyIndex WHERE mapID = ".$mapID);
- 		
+
 		$DB->sql_put("COMMIT");
-		
+
 		return l_t('The unit destroy indexes were recreated for map ID #%s ; there were %s entries before and there are currently %s entries.', $mapID, $entriesBefore, $entriesAfter);
 	}
 }
