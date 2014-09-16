@@ -3,7 +3,8 @@ body {
 	font-family: sans-serif;
 	margin: 0;
 	padding: 0;
-	background-color: #FFFF66;
+	background: url(../images/parchment-background.jpg) center top #E6D0A0;
+	background-repeat: repeat-x;
 	text-align: center;
 	color: #39383A;
 }
