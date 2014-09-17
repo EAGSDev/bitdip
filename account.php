@@ -56,8 +56,17 @@ echo '<li class="formlistdesc">Give your friend one of these single-use invitati
 
 print '<form method="post" action="./account_form_process.php">';
 print '<li class="formlisttitle">E-mail address</li>';
-print '<li class="formlistfield"><input type="text" name="email" size="50" value="'.$user_data['email'].'"  /></li>';
-print '<li class="formlistfield"><input type="submit" class="form-submit notice" value="Change email"></li>';
+if (isset($_GET['emailToken'])) {
+	print '<li class="formlistfield"><input type="text" name="emailchange" size="50" value="'.$user_data['email'].'"  /></li>';
+	print '<input type="hidden" name="emailToken" value="'.$_GET['emailToken'].'" />';
+	print '<li class="formlistfield"><input type="submit" class="form-submit notice" value="Change email"></li>';
+}
+else {
+	print '<li class="formlistfield">'.$user_data['email'].'</li>';
+	print '<input type="hidden" name="emailchangerequest" value="1" />';
+	print '<li class="formlistfield"><input type="submit" class="form-submit notice" value="Request email change"></li>';
+}
+
 print '<li class="formlistdesc">Your e-mail address; this will <strong>not</strong> be spammed or given out to anyone.</li>';
 print '</form>';
 
