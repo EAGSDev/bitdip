@@ -117,6 +117,8 @@ if (isset($_POST['forgotUsername']) && !empty($_POST['forgotUsername'])) {
 		$query="UPDATE wD_Users SET password=?, PasswordTemp=1, PasswordTempTimestamp=NOW() WHERE id=?";
 		$result=$DBi->query("$query",array($hashedpassword,$userid));
 
+
+
 		$subject='BitDip account information';
 		$body='<p>We have recieved a request to reset the password on your BitDip account. Below is your temporary password, which is good for approximately 15 minutes.</p><p><b>'.$newpassword.'</b></p>';
 

@@ -123,8 +123,8 @@ else if (isset($_POST['emailToken']) && isset($_POST['password']) && isset($_POS
 	if (empty($error)) {
 		$hasher = new PasswordHash(8, false);
 		$hashedpassword = $hasher->HashPassword($password);
-		$query="INSERT INTO wD_Users (username,email,source,comment,password,timeJoined,timeLastSessionEnded) VALUES (?,?,?,?,?,NOW(),NOW())";
-		$result=$DBi->query("$query",array($username,$email,$source,$comment,$hashedpassword));
+		$query="INSERT INTO wD_Users (username,email,source,comment,password,timeJoined,timeLastSessionEnded) VALUES (?,AES_ENCRYPT(?,?),?,?,?,NOW(),NOW())";
+		$result=$DBi->query("$query",array($username,$email,$aes_encrypt_key,$source,$comment,$hashedpassword));
 		$newuserid = $DBi->insert_id;
 		$bitdip= new BitDip();
 		$newkey=$bitdip->generatesecuritykey($newuserid);
