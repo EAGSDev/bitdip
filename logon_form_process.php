@@ -40,7 +40,7 @@ if (isset($_POST['loginuser']) AND isset($_POST['loginpass'])) {
 
         if ($check && empty($error)) { // A match was made.
         	$_SESSION['authorized']=1;
-        	$_SESSION['user_data']['id'] = $userid;
+        	$_SESSION['user_data']=''; // this needs to be reset in header.php
         	$query="UPDATE wD_Users SET FailedLoginCount=0 WHERE id=?";
         	$result=$DBi->query("$query",array($userid));
         	$servername=$_SERVER['SERVER_NAME'];

@@ -41,19 +41,11 @@ $Misc = new Misc();
 
 
 ################################################################
-// new authentication
+// authentication
 
 if (isset($_SESSION['user_data'])) {
 	$userid=$_SESSION['user_data']['id'];
 	$User = new User($userid);
-}
-else if (isset($_COOKIE['security_key'])) {
-	$givenkey=$_COOKIE['security_key'];
-	$query="SELECT id FROM wD_Users WHERE SHA2(SecurityKey)=?";
-	$row=$DBi->fetch_row("$query",false,array($givenkey));
-	if ($row) {$userid=$row['id'];} else {$userid=GUESTID;}
-	$User = new User($userid);
-	$_SESSION['user_data']['id']=$userid;
 }
 else {
 	$User = new User(GUESTID);
