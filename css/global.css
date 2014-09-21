@@ -1,10 +1,12 @@
+/* using this pallette http://www.colorcombos.com/color-schemes/253/ColorCombo253.html */
+
 body {
 	font-size: 14px;
 	font-family: sans-serif;
 	margin: 0;
 	padding: 0;
 	background: url(../images/parchment-background.jpg) center top #E6D0A0;
-	background-repeat: repeat-x;
+	background-repeat: repeat-y;
 	text-align: center;
 	color: #39383A;
 }
@@ -143,7 +145,7 @@ li.formlisttitle {
 
 .form-submit {
 	font-weight: bold ! important;
-	color: #006699 ! important;
+	color: #665847 ! important;
 }
 li.formlistfield {
 	list-style: none;
@@ -243,13 +245,13 @@ a {
 	text-decoration:underline;
 }
 a:link {
-	color: #006699;
+	color: #665847;
 }
 a:visited {
-	color: #006699;
+	color: #665847;
 }
 a:active {
-	color: #006699;
+	color: #665847;
 }
 a:hover {
 	color: #009902 ! important;
@@ -319,7 +321,7 @@ a.light {
 	margin: 0;
 	padding: 0;
 	width: auto;
-	background-color: #006699;
+	background-color: #665847;
 	font-size: 0;
 	height: 5px;
 	border-top: 1px solid #000;
@@ -333,7 +335,7 @@ a.light {
 	margin: 0;
 	padding: 0;
 	width: 800px;
-	background-color: #006699;
+	background-color: #665847;
 	font-size: 0;
 	height: 5px;
 	border-top: 1px solid #000;
@@ -470,7 +472,7 @@ div.gamelistings-tabs a {
 	border-left:1px solid #aaa;
 	border-right:1px solid #aaa;
 	
-	border-bottom:2px solid #006699 ! important;
+	border-bottom:2px solid #665847 ! important;
 }
 div#chatboxtabs a {
 	margin-left:2px;
