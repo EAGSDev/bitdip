@@ -234,26 +234,24 @@ if( !defined('AJAX') )
 ################################################################
 // new authentication
 
-if (isset($_SESSION['user_data']['id'])) {
-	$userid=$_SESSION['user_data']['id'];
+
+
+if (!isset($_SESSION['user_data'])) {
+
+	$userid=GUESTID;
+
+	if (isset($_COOKIE['security_key'])) {
+		$givenkey=$_COOKIE['security_key'];
+		$query="SELECT id FROM wD_Users WHERE SecurityKey=?";
+		$row=$DBi->fetch_row("$query",false,array($givenkey));
+		if ($row) {$userid=$row['id'];}
+	}// end if (isset($_COOKIE['security_key']))
+
 	$User = new User($userid);
-}
-else if (isset($_COOKIE['security_key'])) {
-	$givenkey=$_COOKIE['security_key'];
-	$query="SELECT id,username,SecurityKey,AES_DECRYPT(email,?) AS email FROM wD_Users WHERE SecurityKey=?";
-	$user_data=$DBi->fetch_row("$query",false,array($aes_encrypt_key,$givenkey));
-	if ($user_data) {
-		$_SESSION['user_data']=$user_data;
-		$userid=$user_data['id'];
-	} //
-	else {$userid=GUESTID;}
-	$User = new User($userid);
-	$_SESSION['user_data']['id']=$userid;
-}
-else {
-	$User = new User(GUESTID);
-	$_SESSION['user_data']['id']=$User->id;
-}
+
+}// end if (!isset($_SESSION['user_data']) && isset($_COOKIE['security_key']))
+
+else {$User = new User($_SESSION['user_data']['id']);}
 
 #########################################################
 ################################################################

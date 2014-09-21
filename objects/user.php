@@ -230,24 +230,8 @@ class User {
 			$DB->sql_put("UPDATE wD_Users SET points = points + ".$points." WHERE id = ".$userID);
 	}
 
-	/**
-	 * Find the ID of the user which has the given e-mail, or return 0 if it doesn't exist
-	 * *Does not filter input!*
-	 *
-	 * @param $email
-	 * @return int
-	 */
-	public static function findEmail($email)
-	{
-		global $DB;
 
-		list($id) = $DB->sql_row("SELECT id FROM wD_Users WHERE email='".$email."'");
 
-		if ( isset($id) and $id )
-			return $id;
-		else
-			return 0;
-	}
 
 	/**
 	 * Find the ID of the user which has the given username, or return 0 if it doesn't exist
@@ -268,69 +252,6 @@ class User {
 			return 0;
 	}
 
-	/**
-	 * Filter a registration/user control panel form. An exception is thrown if
-	 * data can't be filtered. An array of variables usable in SQL are returned.
-	 *
-	 * @param array $input An array of unfiltered data from a registration/control panel form
-	 * @return array An array of filtered SQL insertable data
-	 */
-	public static function processForm($input, &$errors)
-	{
-		global $DB;
-
-		$SQLVars = array();
-
-		$available = array('username'=>'', 'password'=>'', 'email'=>'','comment'=>'', 'source'=>'');
-
-		$userForm = array();
-
-		foreach($available as $name=>$val)
-		{
-			if ( isset($input[$name]) and $input)
-			{
-				$userForm[$name] = $input[$name];
-			}
-		}
-
-		if( isset($userForm['username']) )
-		{
-			$SQLVars['username'] = $DB->escape($userForm['username']);
-		}
-
-		if( isset($userForm['password']) and $userForm['password'] )
-		{
-			$SQLVars['password'] = "UNHEX('".libAuth::pass_Hash($userForm['password'])."')";
-		}
-
-		if(isset($userForm['email']) and $userForm['email'] )
-		{
-			$userForm['email'] = $DB->escape($userForm['email']);
-			if( !libAuth::validate_email($userForm['email']) )
-			{
-				$errors[] = l_t("The e-mail address you entered isn't valid. Please enter a valid one");
-			}
-			else
-			{
-				$SQLVars['email'] = $userForm['email'];
-			}
-		}
-
-		if( isset($userForm['source']) )
-		{
-			$SQLVars['source'] = $userForm['source'];
-		}
-
-
-		if(isset($userForm['comment']) AND $userForm['comment'] )
-		{
-			$userForm['comment'] = $DB->msg_escape($userForm['comment']);
-
-			$SQLVars['comment'] = $userForm['comment'];
-		}
-
-		return $SQLVars;
-	}
 
 	/**
 	 * Initialize a user object
@@ -338,17 +259,12 @@ class User {
 	 * @param int $id User ID
 	 * @param string|bool[optional] $username Look the user up based on username instead of user ID
 	 */
-	function __construct($id, $username=false)
+	function __construct($id)
 	{
-		if ( $username )
-		{
-			$this->load($username);
-		}
-		else
-		{
+
 			$this->id = intval($id);
-			$this->load();
-		}
+			$this->load($this->id);
+
 	}
 
 	/**
@@ -356,15 +272,18 @@ class User {
 	 *
 	 * @param string|bool[optional] If the username is given it is being used instead of ID to load the User *Not filtered*
 	 */
-	function load($username=false)
+	function load($userid)
 	{
-		global $DB;
+		global $DBi;
+		global $aes_encrypt_key;
 
-		$row = $DB->sql_hash("SELECT
+		if (!is_numeric($userid)) {$userid=GUESTID;}
+
+		$query = "SELECT
 			u.id,
 			u.username,
 			LOWER(HEX(u.password)) as password,
-			u.email,
+			AES_DECRYPT(u.email,?) AS email,
 			u.type,
 			u.comment,
 			u.timeJoined,
@@ -377,7 +296,8 @@ class User {
 			IF(s.userID IS NULL,0,1) as online
 			FROM wD_Users u
 			LEFT JOIN wD_Sessions s ON ( u.id = s.userID )
-			WHERE ".( $username ? "u.username='".$username."'" : "u.id=".$this->id ));
+			WHERE u.id=?";
+		$row=$DBi->fetch_row("$query",false,array($aes_encrypt_key,$userid));
 
 		if ( ! isset($row['id']) or ! $row['id'] )
 		{
@@ -387,6 +307,7 @@ class User {
 		foreach( $row as $name=>$value )
 		{
 			$this->{$name} = $value;
+			$_SESSION['user_data'][$name]=$value;
 		}
 
 		// Convert an array of types this user has into an array of true/false indexed by type
@@ -405,6 +326,7 @@ class User {
 			}
 		}
 		$this->type = $types;
+		$_SESSION['user_data']['type']=$types;
 
 		$this->notifications=new setUserNotifications($this->notifications);
 
