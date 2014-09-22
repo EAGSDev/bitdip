@@ -195,35 +195,7 @@ class libHome
 
 		return $stats;
 	}
-	static function globalInfo()
-	{
-		$userStats = self::statsGlobalUser();
-		$gameStats = self::statsGlobalGame();
-		//$topUsers = self::topUsers();
 
-		//$buf='<div class="content" style="text-align:center;"><strong>Users:</strong> ';
-		$buf='<strong>'.l_t('Users:').'</strong> ';
-		$first=true;
-		foreach($userStats as $name => $val)
-		{
-			if( $first ) $first=false; else $buf .= ' - ';
-			$buf .= l_t($name).':<strong>'.$val.'</strong>';
-		}
-
-		$buf .= '<br /><strong>'.l_t('Games:').'</strong> ';
-		$first=true;
-		foreach($gameStats as $name => $val)
-		{
-			if( $first ) $first=false; else $buf .= ' - ';
-			$buf .= l_t($name).':<strong>'.$val.'</strong>';
-		}
-
-		//$buf .= '</div>';
-		//$buf .= '<br /><h3>Hall of fame</h3>'.implode('<br />',$topUsers);
-
-
-		return $buf;
-	}
 
 	static public function gameNotifyBlock ()
 	{
@@ -386,7 +358,6 @@ class libHome
 
 if( !$User->type['User'] )
 {
-	print '<div class="content-notice" style="text-align:center">'.libHome::globalInfo().'</div>';
 	print libHTML::pageTitle(l_t('Welcome to BitDip'),l_t('A game of grand strategy played for bitcoin.'));
 	//print '<div class="content">';
 	?>
@@ -422,16 +393,11 @@ if( !$User->type['User'] )
 		$welcomtext.='<p>Let\'s say for the sake of this illustration there are 10 supply centers on the board (there are 34 in classic Diplomacy). If 10 players enter the game, then the liquidation value of the game will be 1000 bits at 100 bits per supply center. Let\'s say through the course of play, Alpha and Bravo succeed in eliminating the other players and they each now hold 5 supply centers. They have profitted handsomely from their skilled play. If they are both satisfied, they can agree to liquidate the board and cash out (500 bits each). However, let\'s say Alpha doesn\'t want to liquidate. He wants to keep playing and try to win more. They cannnot liquidate unless they both agree, so if Bravo wants out, he has to find another way to exit the game. He can do so by selling his supply centers to another player, and he can offer an incentive by aggreeing to sell his 5 centers below par. Let\'s say Charlie is willing to buy the 5 centers for 400 bits. Bravo gets out of the game profitably -- he spent 100 bits to get in, and made 300 more when he sold out. Now if Charlie continues to play with Alpha, and let\'s say nothing changes and they both decide to liquidate, Charlie will make 100 bits (500 at liqudation minus the 400 he paid Bravo) and Alpha makes 400 bits (500 at liquidation minus 100 he paid to enter the game).';
 
 		print l_t($welcomtext);
-	?>
-	</p>
 
-	<?php
-	print '</div>';
+	print '</p>';
+	pring '</div>';
 
-	//print '<div class="homeInfoList">'.libHome::globalInfo().'</div>';
 
-	//require_once(l_r('locales/English/intro.php'));
-	//print '</div>';
 }
 elseif( isset($_REQUEST['notices']) )
 {
