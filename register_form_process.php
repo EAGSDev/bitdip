@@ -44,7 +44,7 @@ if (isset($_POST['emailValidate']) && isset($_POST['InviteCode']) && isset($_POS
 	// check for duplicate in use
 	$query = "SELECT username FROM wD_Users WHERE username=?";
 	$row = $DBi->fetch_row("$query",false,array($username));
-	if ($row) {$error .='<p>That Username is not available. Please enter another.</p>';}
+	if ($row) {$error .='<p>That Username ('.$username.') is not available. Please enter another.</p>';}
 
 	##########################################
 	// email and username are ok, now update or create registration record
@@ -74,16 +74,18 @@ if (isset($_POST['emailValidate']) && isset($_POST['InviteCode']) && isset($_POS
 		$error .='<p>The invitation code is not valid.</p>';
 	}
 	else {
-		$source=$row['UserID'];
-		$token=md5($email.$username.$invitecode.$regid.session_id());
-		$query="UPDATE bd_registrations SET username=?, InviteCode=?, Source=?, Token=? WHERE RegistrationID=?";
-		$result=$DBi->query("$query",array($username,$invitecode,$source,$token,$regid));
-		// generate new invite code for source
-		$bitdip= new BitDip();
-		$newinvitecode=$bitdip->generateinvitecode();
-		$query="UPDATE bd_invitecodes SET InviteCode=? WHERE InviteCode=?";
-		$result=$DBi->query("$query",array($newinvitecode,$invitecode));
-	}
+		if (empty($error)) {
+			$source=$row['UserID'];
+			$token=md5($email.$username.$invitecode.$regid.session_id());
+			$query="UPDATE bd_registrations SET username=?, InviteCode=?, Source=?, Token=? WHERE RegistrationID=?";
+			$result=$DBi->query("$query",array($username,$invitecode,$source,$token,$regid));
+			// generate new invite code for source
+			$bitdip= new BitDip();
+			$newinvitecode=$bitdip->generateinvitecode();
+			$query="UPDATE bd_invitecodes SET InviteCode=? WHERE InviteCode=?";
+			$result=$DBi->query("$query",array($newinvitecode,$invitecode));
+		}// end if (empty($error))
+	}// end else
 
 
 	if (empty($error)) {
@@ -123,8 +125,9 @@ else if (isset($_POST['emailToken']) && isset($_POST['password']) && isset($_POS
 	if (empty($error)) {
 		$hasher = new PasswordHash(8, false);
 		$hashedpassword = $hasher->HashPassword($password);
-		$query="INSERT INTO wD_Users (username,email,source,comment,password,timeJoined,timeLastSessionEnded) VALUES (?,AES_ENCRYPT(?,?),?,?,?,NOW(),NOW())";
-		$result=$DBi->query("$query",array($username,$email,$aes_encrypt_key,$source,$comment,$hashedpassword));
+		$now=time();
+		$query="INSERT INTO wD_Users (username,email,source,comment,password,timeJoined,timeLastSessionEnded) VALUES (?,AES_ENCRYPT(?,?),?,?,?,?,?)";
+		$result=$DBi->query("$query",array($username,$email,$aes_encrypt_key,$source,$comment,$hashedpassword,$now,$now));
 		$newuserid = $DBi->insert_id;
 		$bitdip= new BitDip();
 		$newkey=$bitdip->generatesecuritykey($newuserid);

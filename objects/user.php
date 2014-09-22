@@ -301,6 +301,7 @@ class User {
 
 		if ( ! isset($row['id']) or ! $row['id'] )
 		{
+			$_SESSION['user_data']['id']=GUESTID;
 			throw new Exception(l_t("A user object has been created which doesn't represent a real user."));
 		}
 
