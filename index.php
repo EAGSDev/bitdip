@@ -367,7 +367,7 @@ if( !$User->type['User'] )
 		$welcomtext='';
 		$welcomtext.='<p><b>SPECIAL NOTICE: BitDip is an open source web development project in it\'s very early stages. Jim Bursch is the lead developer and he can be found on GitHub: <a href="https://github.com/jimbursch">https://github.com/jimbursch</a>.</b></p>';
 
-		$welcomtext.='<p><b>What is Bit?</b><br />A bit is one/millionth of a <a href="https://en.wikipedia.org/wiki/Bitcoin">bitcoin</a>, which is a digital currency or money.</p>';
+		$welcomtext.='<p><b>What is Bit?</b><br />A bit is one/millionth of a <a href="http://bitcoin.com">bitcoin</a>, which is a digital currency or money.</p>';
 
 		$welcomtext.='<p><b>What is Dip?</b><br />Dip is a game of grand strategy forked from the open source <a href="http://webdiplomacy.net">webDiplomacy</a> project.</p>';
 
@@ -395,7 +395,7 @@ if( !$User->type['User'] )
 		print l_t($welcomtext);
 
 	print '</p>';
-	pring '</div>';
+	print '</div>';
 
 
 }
