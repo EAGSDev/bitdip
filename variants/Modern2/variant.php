@@ -60,15 +60,9 @@ class Modern2Variant extends WDVariant {
 		$this->variantClasses['processOrderBuilds'] = 'Modern2';
 		$this->variantClasses['processOrderDiplomacy'] = 'Modern2';
 
-		################################################
-		// custom start variant added to this varient
+		$this->variantClasses['processGame'] = 'Modern2';
 
-		// Altered to disable the creation of starting units
-		$this->variantClasses['adjudicatorPreGame'] = 'CustomStart';
 
-		// Altered to change the starting order of a game's phases; Spring 1901 Pre-game|Unit-placing|Diplomacy|Retreats ->
-		$this->variantClasses['processGame'] = 'CustomStart';
-		#####################################################
 
 	}
 
