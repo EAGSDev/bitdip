@@ -50,19 +50,17 @@ class Modern2Variant extends WDVariant {
 
 	public $countries=array('Britain', 'Egypt', 'France', 'Germany', 'Italy', 'Poland', 'Russia', 'Spain', 'Turkey', 'Ukraine');
 
-
 	public function __construct() {
 		parent::__construct();
 
 		$this->variantClasses['drawMap']            = 'Modern2';
 		$this->variantClasses['adjudicatorPreGame'] = 'Modern2';
-		$this->variantClasses['processGame'] = 'Modern2';
 		$this->variantClasses['userOrderBuilds']    = 'Modern2';
 		$this->variantClasses['OrderInterface']     = 'Modern2';
 		$this->variantClasses['processOrderBuilds'] = 'Modern2';
 		$this->variantClasses['processOrderDiplomacy'] = 'Modern2';
 
-
+		$this->variantClasses['processGame'] = 'Modern2';
 
 
 
