@@ -825,7 +825,7 @@ class libHTML
 
 	static private function footerCopyright() {
 		// Version, sourceforge and HTML compliance logos
-		return l_t('webDiplomacy version <strong>%s</strong>',number_format(VERSION/100,2)).'<br />';
+		return l_t('version <strong>%s</strong>',number_format(VERSION/100,2)).'<br />';
 	}
 
 	/*
