@@ -18,7 +18,7 @@
 	along with webDiplomacy. If not, see <http://www.gnu.org/licenses/>.
 
 	---
-	
+
 	Changelog:
 	1.0:     initial release by Carey Jensen
 	1.5:     new webdip v.98 code by Oliver Auth
@@ -40,8 +40,8 @@ class Modern2Variant extends WDVariant {
 	public $id         = 19;
 	public $mapID      = 19;
 	public $name       = 'Modern2';
-	public $fullName   = 'Modern Diplomacy II';
-	public $description= 'Modern Diplomacy II is intended to be diplomacy with an updated map, circa 1994, taking place in Europe, the Middle East and North Africa.';
+	public $fullName   = 'Modern Europe';
+	public $description= 'Modern Europe is a modification of the Modern Diplomacy II variant.';
 	public $author     = 'Vincent Mous';
 	public $adapter    = 'Carey Jensen / Oliver Auth';
 	public $version    = 'II';
@@ -59,14 +59,24 @@ class Modern2Variant extends WDVariant {
 		$this->variantClasses['OrderInterface']     = 'Modern2';
 		$this->variantClasses['processOrderBuilds'] = 'Modern2';
 		$this->variantClasses['processOrderDiplomacy'] = 'Modern2';
-		
+
+		################################################
+		// custom start variant added to this varient
+
+		// Altered to disable the creation of starting units
+		$this->variantClasses['adjudicatorPreGame'] = 'CustomStart';
+
+		// Altered to change the starting order of a game's phases; Spring 1901 Pre-game|Unit-placing|Diplomacy|Retreats ->
+		$this->variantClasses['processGame'] = 'CustomStart';
+		#####################################################
+
 	}
 
 	public function initialize() {
 		parent::initialize();
 		$this->supplyCenterTarget = 33;
 	}
-	
+
 	public function turnAsDate($turn) {
 		if ( $turn==-1 ) return "Pre-game";
 		else return ( $turn % 2 ? "Autumn, " : "Spring, " ).(floor($turn/2) + 1994);
@@ -78,6 +88,9 @@ class Modern2Variant extends WDVariant {
 			else return ( turn%2 ? "Autumn, " : "Spring, " )+(Math.floor(turn/2) + 1994);
 		};';
 	}
+
+
+
 }
 
 ?>
