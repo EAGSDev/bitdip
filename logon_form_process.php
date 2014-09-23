@@ -1,6 +1,7 @@
 <?php
 
-require_once('header_min.php');
+require_once('header.php');
+
 require_once('PasswordHash.php');
 require_once('objects/user.php');
 

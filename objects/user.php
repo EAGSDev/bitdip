@@ -282,6 +282,7 @@ class User {
 		$query = "SELECT
 			u.id,
 			u.username,
+			u.SecurityKey,
 			LOWER(HEX(u.password)) as password,
 			AES_DECRYPT(u.email,?) AS email,
 			u.type,

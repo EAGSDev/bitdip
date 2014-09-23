@@ -1,6 +1,6 @@
 <?php
 
-require_once('header_min.php');
+require_once('header.php');
 require_once('PasswordHash.php');
 
 
@@ -49,7 +49,7 @@ if (isset($_POST['emailToken']) && isset($_POST['emailchange'])) {
 	$emailToken=$_POST['emailToken'];
 	$userid=$_SESSION['user_data']['id'];
 
-	if ($emailToken != hash('md5', implode($_SESSION['user_data']))) {$error .= '<p>The email token is not valid.</p>';}
+	if ($emailToken != hash('md5', $_SESSION['user_data']['SecurityKey'].$_SESSION['user_data']['email'])) {$error .= '<p>The email token is not valid.</p>';}
 	if(!filter_var($newemail, FILTER_VALIDATE_EMAIL)) {	$error .='<p>Please enter a valid email address.</p>';}
 
 	if (empty($error)) {
@@ -75,7 +75,7 @@ if (isset($_POST['emailchangerequest'])) {
 	$username=$_SESSION['user_data']['username'];
 	require_once('objects/mailer.php');
 	$Mailer = new Mailer();
-	$emailToken = hash('md5', implode($_SESSION['user_data']));
+	$emailToken = hash('md5', $_SESSION['user_data']['SecurityKey'].$_SESSION['user_data']['email']);
 	$url = 'http://'.$_SERVER['SERVER_NAME'].'/account.php?emailToken='.$emailToken;
 	$subject='BitDip email change request';
 	$body='<p>Hello '.$_SESSION['user_data']['username'].'</p><p>We have received a request to change your account email address. To complete the request, log in to your account and visit this url:</p><p><a href="'.$url.'">'.$url.'</a></p>';

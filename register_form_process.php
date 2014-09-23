@@ -1,7 +1,7 @@
 <?php
 
 
-require_once('header_min.php');
+require_once('header.php');
 require_once('PasswordHash.php');
 
 
@@ -12,6 +12,9 @@ $Mailer = new Mailer();
 
 if ( $Misc->Panic ){die('Registration has been temporarily closed');}
 
+
+$email='';
+$username='';
 
 
 if (isset($_POST['emailValidate']) && isset($_POST['InviteCode']) && isset($_POST['Username']) ) {
@@ -27,10 +30,11 @@ if (isset($_POST['emailValidate']) && isset($_POST['InviteCode']) && isset($_POS
 		$error .='<p>A first check of this e-mail is finding it invalid. Remember you need one to play, and it will not be spammed or released.</p>';
 	}// end if(!filter_var($email, FILTER_VALIDATE_EMAIL))
 
-	$query="SELECT email FROM wD_Users WHERE email=?";
-	$row=$DBi->fetch_row("$query", false, array($email));
-	if($row) {$error .='<p>The e-mail address '.$email.', is already in use. Please choose another.</p>';}
-
+	if (empty($error)) {
+		$query="SELECT email FROM wD_Users WHERE email=?";
+		$row=$DBi->fetch_row("$query", false, array($email));
+		if($row) {$error .='<p>The e-mail address '.$email.', is already in use. Please choose another.</p>';}
+	}// end if (empty($error))
 
 	#########################################
 	// check the username
@@ -42,9 +46,11 @@ if (isset($_POST['emailValidate']) && isset($_POST['InviteCode']) && isset($_POS
 	if (!ctype_alnum(str_replace('_', '', $username))) {$error .='<p>Please enter a Username using only lowercase letters, numbers and underscore(_).</p>';}
 
 	// check for duplicate in use
-	$query = "SELECT username FROM wD_Users WHERE username=?";
-	$row = $DBi->fetch_row("$query",false,array($username));
-	if ($row) {$error .='<p>That Username ('.$username.') is not available. Please enter another.</p>';}
+	if (empty($error)) {
+		$query = "SELECT username FROM wD_Users WHERE username=?";
+		$row = $DBi->fetch_row("$query",false,array($username));
+		if ($row) {$error .='<p>That Username ('.$username.') is not available. Please enter another.</p>';}
+	}// end if (empty($error))
 
 	##########################################
 	// email and username are ok, now update or create registration record
@@ -58,34 +64,36 @@ if (isset($_POST['emailValidate']) && isset($_POST['InviteCode']) && isset($_POS
 			$result=$DBi->query("$query",array($email,$aes_encrypt_key,$username));
 			$regid = $DBi->insert_id;
 		}// end else
-	}
+	}// end if (empty($error))
 	else {$_SESSION['notification']=$error;}
 
 
 	##################################
 	// check the invite code
 
-	$invitecode=trim($_POST['InviteCode']);
-	$query="SELECT UserID, InviteCode FROM bd_invitecodes WHERE InviteCode=?";
-	$row=$DBi->fetch_row("$query", false, array($invitecode));
-	if(!$row) {
-		$query="UPDATE bd_registrations SET FailCount=FailCount+1 WHERE RegistrationID=?";
-		$result=$DBi->query("$query",array($regid));
-		$error .='<p>The invitation code is not valid.</p>';
-	}
-	else {
-		if (empty($error)) {
-			$source=$row['UserID'];
-			$token=md5($email.$username.$invitecode.$regid.session_id());
-			$query="UPDATE bd_registrations SET username=?, InviteCode=?, Source=?, Token=? WHERE RegistrationID=?";
-			$result=$DBi->query("$query",array($username,$invitecode,$source,$token,$regid));
-			// generate new invite code for source
-			$bitdip= new BitDip();
-			$newinvitecode=$bitdip->generateinvitecode();
-			$query="UPDATE bd_invitecodes SET InviteCode=? WHERE InviteCode=?";
-			$result=$DBi->query("$query",array($newinvitecode,$invitecode));
-		}// end if (empty($error))
-	}// end else
+	if (empty($error)) {
+		$invitecode=trim($_POST['InviteCode']);
+		$query="SELECT UserID, InviteCode FROM bd_invitecodes WHERE InviteCode=?";
+		$row=$DBi->fetch_row("$query", false, array($invitecode));
+		if(!$row) {
+			$query="UPDATE bd_registrations SET FailCount=FailCount+1 WHERE RegistrationID=?";
+			$result=$DBi->query("$query",array($regid));
+			$error .='<p>The invitation code is not valid.</p>';
+		}
+		else {
+			if (empty($error)) {
+				$source=$row['UserID'];
+				$token=md5($email.$username.$invitecode.$regid.session_id());
+				$query="UPDATE bd_registrations SET username=?, InviteCode=?, Source=?, Token=? WHERE RegistrationID=?";
+				$result=$DBi->query("$query",array($username,$invitecode,$source,$token,$regid));
+				// generate new invite code for source
+				$bitdip= new BitDip();
+				$newinvitecode=$bitdip->generateinvitecode();
+				$query="UPDATE bd_invitecodes SET InviteCode=? WHERE InviteCode=?";
+				$result=$DBi->query("$query",array($newinvitecode,$invitecode));
+			}// end if (empty($error))
+		}// end else
+	}// end if (empty($error))
 
 
 	if (empty($error)) {
@@ -149,30 +157,6 @@ else if (isset($_POST['emailToken']) && isset($_POST['password']) && isset($_POS
 		header("Location: ./index.php");
 		die('line 147');
 	}// end if (empty($error))
-
-
-
-/*
-
-	print libHTML::pageTitle(l_t('Register a webDiplomacy account'),l_t('Validate your e-mail address -&gt; Enter your account settings -&gt; <strong>Play webDiplomacy!</strong>'));
-
-	print "<h3>".l_t("Welcome to webDiplomacy!")."</h3>
-			<p>".l_t("Welcome, %s!",$SQLVars['username'])."<br /><br />
-
-				".l_t("You can now post in the <a href='forum.php' class='light'>forum</a>, ".
-				"look for <a href='gamelistings.php' class='light'>a game to join</a>, ".
-				"create a <a href='gamecreate.php' class='light'>new game</a>, ".
-				"or get some <a href='help.php' class='light'>help/info</a>.")."<br /> ".
-				l_t("Be sure to bookmark the <a href='index.php' class='light'>home page</a>, ".
-				"which displays a summary of your games and forum activity.")."<br /><br />
-
-				".l_t("If you don't know what Diplomacy is about yet check out the quick
-				<a href='intro.php' light='class'>graphical intro to webDiplomacy</a>,
-				so you can get going faster.")."
-			</p>";
-	print '</div>';
-
-*/
 
 
 }// end else if (isset($_POST['emailToken']))
