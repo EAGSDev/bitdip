@@ -42,12 +42,12 @@ if (isset($_POST['loginuser']) AND isset($_POST['loginpass'])) {
 
 
         if ($check && empty($error)) { // A match was made.
-        	$_SESSION['authorized']=1;
+        	$_SESSION['authorized']=$userid;
 	       	$query="UPDATE wD_Users SET FailedLoginCount=0 WHERE id=?";
         	$result=$DBi->query("$query",array($userid));
         	$servername=$_SERVER['SERVER_NAME'];
         	setcookie('security_key', $seckey, time()+31536000, '/',$servername,0);
-        	$User = new User($userid);
+        	$User = new User($userid,true);
         	header("Location: ./index.php");
         	die();
         }// end if ($check && empty($error))

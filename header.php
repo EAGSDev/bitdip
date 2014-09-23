@@ -180,6 +180,8 @@ header("Cache-Control: post-check=0, pre-check=0", false);
 ################################################################
 // new authentication
 
+
+
 if (!isset($_SESSION['user_data'])) {
 
 	$userid=GUESTID;
@@ -191,11 +193,13 @@ if (!isset($_SESSION['user_data'])) {
 		if ($row) {$userid=$row['id'];}
 	}// end if (isset($_COOKIE['security_key']))
 
-	$User = new User($userid);
+	$User = new User($userid,true);
 
 }// end if (!isset($_SESSION['user_data']) && isset($_COOKIE['security_key']))
 
-else {$User = new User($_SESSION['user_data']['id']);}
+else {$User = new User($_SESSION['user_data']['id'],true);}
+
+
 
 #########################################################
 ################################################################
@@ -203,7 +207,7 @@ else {$User = new User($_SESSION['user_data']['id']);}
 
 if (isset($_GET['logoff'])) {
 
-	$userid=$_SESSION['user_data']['id'];
+	if (isset($_SESSION['user_data']['id'])) {$userid=$_SESSION['user_data']['id'];} else {$userid=GUESTID;}
 
 	//set new SecurityKey
 	$bitdip= new BitDip();
@@ -262,7 +266,6 @@ function close()
 
 	die();
 }
-
 
 
 ?>

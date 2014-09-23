@@ -259,11 +259,11 @@ class User {
 	 * @param int $id User ID
 	 * @param string|bool[optional] $username Look the user up based on username instead of user ID
 	 */
-	function __construct($id)
+	function __construct($id,$authentication=false)
 	{
 
 			$this->id = intval($id);
-			$this->load($this->id);
+			$this->load($this->id,$authentication);
 
 	}
 
@@ -272,7 +272,7 @@ class User {
 	 *
 	 * @param string|bool[optional] If the username is given it is being used instead of ID to load the User *Not filtered*
 	 */
-	function load($userid)
+	function load($userid,$authentication)
 	{
 		global $DBi;
 		global $aes_encrypt_key;
@@ -309,7 +309,7 @@ class User {
 		foreach( $row as $name=>$value )
 		{
 			$this->{$name} = $value;
-			$_SESSION['user_data'][$name]=$value;
+			if ($authentication) {$_SESSION['user_data'][$name]=$value;}
 		}
 
 		// Convert an array of types this user has into an array of true/false indexed by type
@@ -328,7 +328,7 @@ class User {
 			}
 		}
 		$this->type = $types;
-		$_SESSION['user_data']['type']=$types;
+		if ($authentication) {$_SESSION['user_data']['type']=$types;}
 
 		$this->notifications=new setUserNotifications($this->notifications);
 

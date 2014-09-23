@@ -1,12 +1,19 @@
 <?php
 
+
+
 require_once('header.php');
+
+
+
+$userid=$_SESSION['user_data']['id'];
+
 
 
 #########################################
 // authorization -- login required
 
-if (!isset($_SESSION['authorized']) || $_SESSION['authorized'] != 1) {
+if (!isset($_SESSION['authorized']) || $_SESSION['authorized'] != $userid) {
 	$_SESSION['notification']='<p>You must sign in to your account with your password to access account settings.</p>';
 	header("location: ./logon.php");
 	die('line 12');
@@ -15,11 +22,10 @@ if (!isset($_SESSION['authorized']) || $_SESSION['authorized'] != 1) {
 ##############################################
 // load user_data
 
-if (isset($_SESSION['user_data']['id'])) {
-$userid=$_SESSION['user_data']['id'];
+
 $query="SELECT id,username,AES_DECRYPT(email,?) AS email,comment FROM wD_Users WHERE id=?";
 $user_data=$DBi->fetch_row("$query",false,array($aes_encrypt_key,$userid));
-}
+
 
 
 libHTML::starthtml();

@@ -7,6 +7,16 @@ require_once('PasswordHash.php');
 $userid=$_SESSION['user_data']['id'];
 $error='';
 
+#########################################
+// authorization -- login required
+
+if (!isset($_SESSION['authorized']) || $_SESSION['authorized'] != $userid) {
+	$_SESSION['notification']='<p>You must sign in to your account with your password to access account settings.</p>';
+	header("location: ./logon.php");
+	die('line 12');
+}// end if (!isset($_SESSION['authorized']) || $_SESSION['authorized'] != 1)
+
+
 ###################################################
 // update password
 
