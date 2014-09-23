@@ -167,74 +167,18 @@ require_once(l_r('objects/misc.php'));
 global $Misc;
 $Misc = new Misc();
 
-if ( $Misc->Version != VERSION )
-{
-	require_once(l_r('install/install.php'));
-}
+
 
 // Taken from the php manual to disable cacheing.
 header("Last-Modified: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Cache-Control: no-store, no-cache, must-revalidate");
 header("Cache-Control: post-check=0, pre-check=0", false);
 
-if( defined('FACEBOOKSCRIPT') ) {
-	require_once(l_r('facebook/facebook-platform/php/facebook.php'));
-	$facebook=new Facebook(Config::$facebookAPIKey,Config::$facebookSecret);
-	$facebook->require_frame();
-
-	$fb_user=$facebook->get_loggedin_user();
-
-	if( !$fb_user ) {
-		if( !isset($_REQUEST['wD_FB_AuthNow'])) {
-			libHTML::notice(l_t('Not authorized'),l_t('To play in webDiplomacy games you need to authorize this application, so that '.
-				'it can send you notifications informing you when a game you\'re playing in needs your attention. '.
-				'Please <a href="index.php?wD_FB_AuthNow=on">authorize this application</a> to continue.'));
-		} else {
-			$fb_user=$facebook->require_login();
-		}
-	}
-}
 
 
-/*###############################
-
-require_once(l_r('lib/auth.php'));
-
-if( !defined('AJAX') )
-{
-	if( isset($_REQUEST['logoff']) )
-	{
-		$success=libAuth::keyWipe();
-		$User = new User(GUESTID); // Give him a guest $User
-		header('refresh: 4; url=logon.php?noRefresh=on');
-		libHTML::notice(l_t("Logged out"),l_t("You have been logged out, and are being redirected to the logon page."));
-	}
-
-	global $User;
-	$User = libAuth::auth();
-
-	if ( $User->type['Admin'] )
-	{
-		Config::$debug=true;
-
-		if ( isset($_REQUEST['auid']) || isset($_SESSION['auid']) )
-			$User = libAuth::adminUserSwitch($User);
-		else
-			define('AdminUserSwitch',$User->id);
-	}
-	elseif ( $Misc->Maintenance )
-	{
-		unset($DB); // This lets libHTML know there's a problem
-		libHTML::error(Config::$serverMessages['Maintenance']);
-
-	}
-}
-*/
 #########################################################
 ################################################################
 // new authentication
-
-
 
 if (!isset($_SESSION['user_data'])) {
 
