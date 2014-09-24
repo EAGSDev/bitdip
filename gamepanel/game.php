@@ -428,7 +428,7 @@ class panelGame extends Game
 			$question .= l_t('The game will start when all %s players have joined.', count($this->Variant->countries));
 		}
 
-		$buf = '<form onsubmit="return confirm(\''.$question.'\');" method="post" action="board.php?gameID='.$this->id.'"><div>
+		$buf = '<form method="post" action="board.php?gameID='.$this->id.'"><div>
 			<input type="hidden" name="formTicket" value="'.libHTML::formTicket().'" />';
 
 		if( $this->phase == 'Pre-game' )
