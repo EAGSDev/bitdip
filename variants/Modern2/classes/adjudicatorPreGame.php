@@ -27,13 +27,13 @@ class Modern2Variant_adjudicatorPreGame extends adjudicatorPreGame {
 			'Spain'   => array('Barcelona' =>'Fleet','Madrid'=>'Army' ,'Seville'  =>'Army' ),
 			'Egypt'   => array('Alexandria'=>'Fleet','Cairo' =>'Fleet','Aswan'    =>'Army' ),
 			'Poland'  => array('Warsaw'    =>'Army' ,'Krakow'=>'Army' ,'Gdansk'   =>'Fleet'),
-  			'Britain' => array('Edinburgh' =>'Fleet','London'=>'Fleet','Liverpool'=>'Fleet','Gibraltar' =>'Fleet'),
-  			'France'  => array('Marseilles'=>'Army' ,'Paris' =>'Army' ,'Bordeaux' =>'Fleet','Lyon'      =>'Army' ),
-  			'Italy'   => array('Milan'	   =>'Army' ,'Rome'  =>'Army' ,'Naples'   =>'Fleet','Venice'    =>'Fleet'),
-  			'Germany' => array('Hamburg'   =>'Fleet','Berlin'=>'Fleet','Munich'   =>'Army' ,'Frankfurt' =>'Army' ),
-  			'Turkey'  => array('Istanbul'  =>'Army' ,'Ankara'=>'Fleet','Izmir'    =>'Fleet','Adana'     =>'Army' ),
-			'Ukraine' => array('Sevastopol'=>'Fleet','Kiev'  =>'Army' ,'Odessa'   =>'Army' ,'Kharkov'   =>'Army' ),
-  			'Russia'  => array('Moscow'    =>'Army' ,'Gorky' =>'Army' ,'Murmansk' =>'Fleet','Rostov'    =>'Fleet', 'St. Petersburg'=>'Fleet'),
+  			'Britain' => array('Edinburgh' =>'Fleet','London'=>'Fleet','Liverpool'=>'Fleet'),
+  			'France'  => array('Marseilles'=>'Army' ,'Paris' =>'Army' ,'Lyon'      =>'Army' ),
+  			'Italy'   => array('Milan'	   =>'Army' ,'Rome'  =>'Army' ,'Venice'    =>'Fleet'),
+  			'Germany' => array('Hamburg'   =>'Fleet','Berlin'=>'Fleet','Frankfurt' =>'Army' ),
+  			'Turkey'  => array('Istanbul'  =>'Army' ,'Ankara'=>'Fleet','Izmir'    =>'Fleet' ),
+			'Ukraine' => array('Sevastopol'=>'Fleet','Kiev'  =>'Army' ,'Odessa'   =>'Army'  ),
+  			'Russia'  => array('Moscow'    =>'Army' ,'Gorky' =>'Army' , 'St. Petersburg'=>'Fleet'),
 		);
 
 }
