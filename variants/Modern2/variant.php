@@ -18,7 +18,7 @@
 	along with webDiplomacy. If not, see <http://www.gnu.org/licenses/>.
 
 	---
-	
+
 	Changelog:
 	1.0:     initial release by Carey Jensen
 	1.5:     new webdip v.98 code by Oliver Auth
@@ -59,22 +59,14 @@ class Modern2Variant extends WDVariant {
 		$this->variantClasses['OrderInterface']     = 'Modern2';
 		$this->variantClasses['processOrderBuilds'] = 'Modern2';
 		$this->variantClasses['processOrderDiplomacy'] = 'Modern2';
-<<<<<<< HEAD
 
-		$this->variantClasses['processGame'] = 'Modern2';
-
-
-
-=======
-		
->>>>>>> parent of 1848f49... Add CustomStart to Modern2
 	}
 
 	public function initialize() {
 		parent::initialize();
 		$this->supplyCenterTarget = 33;
 	}
-	
+
 	public function turnAsDate($turn) {
 		if ( $turn==-1 ) return "Pre-game";
 		else return ( $turn % 2 ? "Autumn, " : "Spring, " ).(floor($turn/2) + 1994);
