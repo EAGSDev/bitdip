@@ -576,7 +576,7 @@ class libHTML
 			else
 			{
 				$links['logon.php']=array('name'=>'Log off', 'inmenu'=>false, 'title'=>"Log onto webDiplomacy using an existing user account");
-				$links['gamecreate.php']=array('name'=>'New game', 'inmenu'=>TRUE, 'title'=>"Start up a new game");
+
 				$links['account.php']=array('name'=>'Account', 'inmenu'=>TRUE, 'title'=>"Change your account settings");
 			}
 		}
@@ -600,6 +600,7 @@ class libHTML
 		if ( is_object($User) )
 		{
 			if ( $User->type['Admin'] or $User->type['Moderator'] )
+				$links['gamecreate.php']=array('name'=>'New game', 'inmenu'=>TRUE, 'title'=>"Start up a new game");
 				$links['admincp.php']=array('name'=>'Admin CP', 'inmenu'=>true);
 
 			$links['gamemaster.php']=array('name'=>'GameMaster', 'inmenu'=>FALSE);
