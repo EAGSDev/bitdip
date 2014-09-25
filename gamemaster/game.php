@@ -518,13 +518,16 @@ class processGame extends Game
 			/*
 			 * The missed phase counter goes up for all players that need to log on in this phase,
 			 * (all players which have orders to enter) and they need to log on to bring it down.
-			 */
+			 #############################################################
+			 ##################################################################
+			 // commented out to disable civil disorders, no moved recieved, and resignation
+			 ##########################################################################
 			$DB->sql_put("UPDATE wD_Members m
 						LEFT JOIN wD_Orders o ON ( o.gameID = m.gameID AND o.countryID = m.countryID )
 						SET m.orderStatus=IF(o.id IS NULL, 'None',''),
 							missedPhases=IF(m.status='Playing' AND NOT o.id IS NULL, missedPhases + 1, missedPhases)
 						WHERE m.gameID = ".$this->id);
-
+			*/
 			$this->processTime = time() + $this->phaseMinutes*60;
 
 			$DB->sql_put("UPDATE wD_Games SET processTime = ".$this->processTime." WHERE id = ".$this->id);
