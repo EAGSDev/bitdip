@@ -134,7 +134,7 @@ else if (isset($_POST['emailToken']) && isset($_POST['password']) && isset($_POS
 		$hasher = new PasswordHash(8, false);
 		$hashedpassword = $hasher->HashPassword($password);
 		$now=time();
-		$query="INSERT INTO wD_Users (username,email,source,comment,password,timeJoined,timeLastSessionEnded) VALUES (?,AES_ENCRYPT(?,?),?,?,?,?,?)";
+		$query="INSERT INTO wD_Users (username,email,source,comment,password,timeJoined,timeLastSessionEnded,JoinedDateTime) VALUES (?,AES_ENCRYPT(?,?),?,?,?,?,?,NOW())";
 		$result=$DBi->query("$query",array($username,$email,$aes_encrypt_key,$source,$comment,$hashedpassword,$now,$now));
 		$newuserid = $DBi->insert_id;
 		$bitdip= new BitDip();

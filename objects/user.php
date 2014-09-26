@@ -309,7 +309,12 @@ class User {
 		foreach( $row as $name=>$value )
 		{
 			$this->{$name} = $value;
-			if ($authentication) {$_SESSION['user_data'][$name]=$value;}
+			if ($authentication) {
+				$_SESSION['user_data'][$name]=$value;
+				$query="UPDATE wD_Users SET LastVisitDateTime=NOW() WHERE id=?";
+				$result=$DBi->query("$query",array($userid));
+			}// end if $authentication
+
 		}
 
 		// Convert an array of types this user has into an array of true/false indexed by type
