@@ -1,160 +1,129 @@
 <?php
 
 
-/**
- * @package Base
- */
 require_once('header.php');
-
 require_once(l_r('lib/message.php'));
-
 require_once(l_r('objects/game.php'));
-
 require_once(l_r('gamepanel/gamehome.php'));
 
-/*
- * A field
- *
- * add(field, index)
- * compare(field1, field2) -> 1 if aligned, 0 if not
- *
- */
 libHTML::starthtml(l_t('Home'));
 
-if( !isset($_SESSION['lastSeenHome']) || $_SESSION['lastSeenHome'] < $User->timeLastSessionEnded )
-{
+if( !isset($_SESSION['lastSeenHome']) || $_SESSION['lastSeenHome'] < $User->timeLastSessionEnded ) {
 	$_SESSION['lastSeenHome']=$User->timeLastSessionEnded;
 }
 
-class libHome
-{
-	static public function getType($type=false, $limit=5)
-	{
+class libHome {
+
+	static public function getType($type=false, $limit=5){
 		global $DB, $User;
-
 		$notices=array();
-
 		$tabl=$DB->sql_tabl("SELECT *
 			FROM wD_Notices WHERE toUserID=".$User->id.($type ? " AND type='".$type."'" : '')."
 			ORDER BY timeSent DESC ".($limit?'LIMIT '.$limit:''));
-		while($hash=$DB->tabl_hash($tabl))
-		{
+		while($hash=$DB->tabl_hash($tabl))	{
 			$notices[] = new notice($hash);
-		}
+		}// end while
 
 		return $notices;
-	}
-	public static function PMs()
-	{
+
+	}// end static public function getType(
+
+	public static function PMs() {
 		$pms = self::getType('PM', 10);
 		$buf = '';
-		foreach($pms as $pm)
-		{
+		foreach($pms as $pm) {
 			$buf .= $pm->html();
-		}
+		}// end foreach
 		return $buf;
-	}
-	public static function Game()
-	{
+	}// end public static function PMs()
+
+	public static function Game() {
 		global $User;
-
 		$pms = self::getType('Game');
-
-		if(!count($pms))
-		{
+		if(!count($pms)) {
 			print '<div class="hr"></div>';
 			print '<p class="notice">'.l_t('No game notices found.').'</p>';
 			return;
-		}
+		}// end if
 
 		print '<div class="hr"></div>';
 
-		foreach($pms as $pm)
-		{
+		foreach($pms as $pm) {
 			print $pm->viewedSplitter();
-
 			print $pm->html();
-		}
-	}
-	public static function NoticePMs()
-	{
+		}// end foreach
+	}// end public static function Game()
+
+
+	public static function NoticePMs() {
 		global $User;
 
-		try
-		{
-			$message=notice::sendPMs();
-		}
-		catch(Exception $e)
-		{
-			$message=$e->getMessage();
-		}
+		try {$message=notice::sendPMs();}
 
-		if ( $message )
-			print '<p class="notice">'.$message.'</p>';
+		catch(Exception $e) {$message=$e->getMessage();	}
+
+		if ($message) {print '<p class="notice">'.$message.'</p>';}
 
 		$pms = self::getType('PM');
 
-		if(!count($pms))
-		{
+		if(!count($pms)) {
 			print '<div class="hr"></div>';
 			print '<p class="notice">'.l_t('No private messages found; you can send them to other people on their profile page.').'</p>';
 			return;
-		}
+		}// end if
 
 		print '<div class="hr"></div>';
 
-		foreach($pms as $pm)
-		{
+		foreach($pms as $pm) {
 			print $pm->viewedSplitter();
-
 			print $pm->html();
-		}
-	}
-	public static function NoticeGame()
-	{
+		}// end foreach
+	}// end public static function NoticePMs()
+
+	public static function NoticeGame()	{
 		global $User;
 
 		$pms = self::getType('Game');
 
-		if(!count($pms))
-		{
+		if(!count($pms)) {
 			print '<div class="hr"></div>';
 			print '<p class="notice">'.l_t('No game notices found; try browsing the <a href="gamelistings.php">game listings</a>, '.
 				'or <a href="gamecreate.php">create your own</a> game.').'</p>';
 			return;
-		}
+		}// end if
 
 		print '<div class="hr"></div>';
 
-		foreach($pms as $pm)
-		{
+		foreach($pms as $pm) {
 			print $pm->viewedSplitter();
-
 			print $pm->html();
-		}
-	}
-	public static function Notice()
-	{
+		}// end foreach
+	}// end public static function NoticeGame()
+
+	public static function Notice() {
 		global $User;
 
 		$pms = self::getType();
 
-		if(!count($pms))
-		{
+		if(!count($pms)) {
 			print '<div class="hr"></div>';
 			print '<p class="notice">'.l_t('No notices found.').'</p>';
 			return;
-		}
+		}// end if
 
 		print '<div class="hr"></div>';
 
-		foreach($pms as $pm)
-		{
+		foreach($pms as $pm) {
 			print $pm->viewedSplitter();
-
 			print $pm->html();
-		}
-	}
+		}// end foreach
+	}// end public static function Notice()
+
+
+################################################
+// comment out global stats etc.
+/*
+
 	static function topUsers()
 	{
 		global $DB;
@@ -196,9 +165,12 @@ class libHome
 		return $stats;
 	}
 
+*/
+##############################################################
+#############################################################
 
-	static public function gameNotifyBlock ()
-	{
+	static public function gameNotifyBlock () {
+
 		global $User, $DB;
 
 		$tabl=$DB->sql_tabl("SELECT g.* FROM wD_Games g
@@ -233,7 +205,7 @@ class libHome
 			'have the points to join.').' </a></p></div>';
 		}
 		return $buf;
-	}
+	}// end static public function gameNotifyBlock ()
 
 	static function forumNew() {
 		// Select by id, prints replies and new threads
@@ -343,27 +315,26 @@ class libHome
 			return '<div class="homeNoActivity">'.l_t('No forum posts found, why not '.
 				'<a href="forum.php?postboxopen=1#postbox" class="light">start one</a>?');
 		}
-	}
+	}// end static function forumNew()
 
 
-	static function forumBlock()
-	{
+	static function forumBlock() {
 		$buf = '<div class="homeHeader">'.l_t('Forum').'</div>';
 
 		$forumNew=libHome::forumNew();
 		$buf .=  '<table><tr><td>'.implode('</td></tr><tr><td>',$forumNew).'</td></tr></table>';
 		return $buf;
-	}
-}
+	}// end static function forumBlock()
+
+}// end class libHome
 
 if( !$User->type['User'] )
 {
 	print libHTML::pageTitle(l_t('Welcome to BitDip'),l_t('A game of grand strategy played for bitcoin.'));
 	//print '<div class="content">';
-	?>
 
-	<p class="welcome">
-	<?php
+	print '<p class="welcome">';
+
 		$welcomtext='';
 		$welcomtext.='<p><b>SPECIAL NOTICE: BitDip is an open source web development project in it\'s very early stages. Jim Bursch is the lead developer and he can be found on GitHub: <a href="https://github.com/jimbursch">https://github.com/jimbursch</a>.</b></p>';
 
@@ -373,15 +344,13 @@ if( !$User->type['User'] )
 
 		$welcomtext.='<p><b>What is BitDip?</b><br />BitDip is a game of grand strategy combined with a system of finance denominated in Bitcoin.</p>';
 
-		$welcomtext.='<p><b>How do you play the game?</b><br />The game mechanics of BitDip are essentially the same as the game mechanics of webDiplomacy using two map variants: modern Europe and the WWIV global map.</p><p>The following are rule variants from classic webDiplomacy:</p><ul><li>Players enter a game at the beginning by bidding for the order in which countries are selected -- the highest bidder selects their country first, the second highest bidder selects second, etc. The bids are placed in the game account and are divided among surviving players at the end (liquidation) of the game, per supply center held.</li><li>Games end when all surviving players vote to liquidate the game and divide up the game funds.</li><li>During the game, players can buy and sell supply centers from each other.</li><li>A new player can enter a game by purchasing supply centers from another player.</li><li>The only way to exit a game before liquidation is to sell out to another player.</li><li>The buying and selling of supply centers takes place at the end of the build phase.</li><li>All supply centers may build units</li></ul>';
-
-		$welcomtext.='<p><b>Is it possible for a game to never end?</b><br />Yes, a game does not end until all surviving players vote to liquidate. Theoretically, a game can go on forever with old players selling out and new players buying in.</p>';
+		$welcomtext.='<p><b>How do you play the game?</b><br />The game mechanics of BitDip are basically the same as the game mechanics of webDiplomacy. BitDip is played on a map of modern Europe or a global map.</p><p>New BitDip players should be familiar with webDiplomacy before attempting to play BitDip. Here is a summary of how BitDip differs from webDiplomacy:</p><ul><li>Players start a game by placing a bid for three supply centers on the game board. The game will begin when enough players have placed a bid.</li><li>The order by which players select their country is determined by the bids. The highest bidder selects a country first, the second highest bidder selects second, etc.</li><li>When the game begins, the players bids are placed into the game account. At the end of the game, the funds are divided between surviving players, per supply center held.</li><li>Games end when all surviving players vote to liquidate the game and divide up the game funds.</li><li>During the game, players can buy and sell supply centers from each other.</li><li>A new player can enter a game by purchasing supply centers from another player.</li><li>The only way to exit a game before liquidation is to sell your supply centers to another player.</li><li>The buying and selling of supply centers takes place at the beginning of the build phase.</li><li>All supply centers may build units</li></ul>';
 
 		$welcomtext.='<p><b>What are BitDip guilds?</b><br />Guilds are organized groups of players who help each other play the game. All players are encouraged to join a guild for assistance, advice, support, and to protect themselves from other guilds.</p>';
 
-		$welcomtext.='<p><b>Is meta-gaming allowed?</b><br />Meta-gaming occurs when players communicate outside a game to coordinate in-game actions. Since it is impossible to enforce a rule against meta-gaming, it is allowed and players are welcome to do their own meta-gaming (such as joining a guild).</p>';
+		$welcomtext.='<p><b>Is meta-gaming allowed?</b><br />Meta-gaming occurs when players communicate outside a game to coordinate in-game actions. Meta-gaming is allowed and players are encouraged to join a guild to develop their own meta-game.</p>';
 
-		$welcomtext.='<p><b>Is multi-accounting allowed?</b><br />Multi-accounting (creating and playing with more than one account) is allowed for the same reason as meta-gaming. However, we don\'t encourage the practice</p>';
+		$welcomtext.='<p><b>Is multi-accounting allowed?</b><br />Multi-accounting (creating and playing with more than one account) is discouraged but not banned. It is impossible to prevent multi-accounting with 100% certainty, so we leave the issue to players and the player community to deal with however they see fit.</p>';
 
 		$welcomtext.='<p><b>How is BitDip different from classic Diplomacy?</b><br />The classic game of <a href="https://en.wikipedia.org/wiki/Diplomacy_%28game%29">Diplomacy</a> is a board game that was invented in the 1950\'s and is currently owned by a subsidiary of Hasbro called Wizards of the Coast. Soon after the game\'s invention and commercialization, the player community developed the game into a sophisticated hobby that went far beyond the face-to-face boardgame. Diplomacy was the first game to be extensively played by mail, then by email, and now the game is played online around the world. Thanks to the dedication of the open source developers of webDiplomacy (formerly phpDiplomacy), Diplomacy the hobby (not the boardgame) can be played any time, any where, with any player who can connect to the Web.</p>';
 
@@ -392,7 +361,7 @@ if( !$User->type['User'] )
 		$welcomtext.='<p>When a game is created, a par value is set for every supply center (e.g. 100 bits). To enter the game, a player has to purchase neutral supply centers at that par value. Let\'s say player Alpha enters the game by purchasing 3 supply centers. The purchase price of those centers (300 bits) goes into the game account, which sets the liquidation value of the game. At this point if Alpha wants to get out of the game and get his money back, he has to move around the board, capture all the supply centers, and liquidate the game. But rather than do that, Alpha waits for another player, Bravo, to enter the game. Bravo purchases 3 supply centers, which increases the liquidation value of the game to 600 bits. Now, if Alpha moves around the board, captures all the supply centers (including those held by Bravo), then liquidates the game, he will make 600 bits, a nice return on his 300 bit investment.</p>';
 		$welcomtext.='<p>Let\'s say for the sake of this illustration there are 10 supply centers on the board (there are 34 in classic Diplomacy). If 10 players enter the game, then the liquidation value of the game will be 1000 bits at 100 bits per supply center. Let\'s say through the course of play, Alpha and Bravo succeed in eliminating the other players and they each now hold 5 supply centers. They have profitted handsomely from their skilled play. If they are both satisfied, they can agree to liquidate the board and cash out (500 bits each). However, let\'s say Alpha doesn\'t want to liquidate. He wants to keep playing and try to win more. They cannnot liquidate unless they both agree, so if Bravo wants out, he has to find another way to exit the game. He can do so by selling his supply centers to another player, and he can offer an incentive by aggreeing to sell his 5 centers below par. Let\'s say Charlie is willing to buy the 5 centers for 400 bits. Bravo gets out of the game profitably -- he spent 100 bits to get in, and made 300 more when he sold out. Now if Charlie continues to play with Alpha, and let\'s say nothing changes and they both decide to liquidate, Charlie will make 100 bits (500 at liqudation minus the 400 he paid Bravo) and Alpha makes 400 bits (500 at liquidation minus 100 he paid to enter the game).';
 
-		print l_t($welcomtext);
+		print $welcomtext;
 
 	print '</p>';
 	print '</div>';
