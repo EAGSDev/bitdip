@@ -125,8 +125,8 @@ if( isset($_REQUEST['newGame']) and is_array($_REQUEST['newGame']) )
 			$input['missingPlayerPolicy']);
 
 		// Create first Member record & object
-		processMember::create($User->id, $input['bet']);
-		$Game->Members->joinedRedirect();
+		//processMember::create($User->id, $input['bet']);
+		//$Game->Members->joinedRedirect();
 	}
 	catch(Exception $e)
 	{
