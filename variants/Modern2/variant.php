@@ -40,8 +40,8 @@ class Modern2Variant extends WDVariant {
 	public $id         = 19;
 	public $mapID      = 19;
 	public $name       = 'Modern2';
-	public $fullName   = 'Modern Diplomacy II';
-	public $description= 'Modern Diplomacy II is intended to be diplomacy with an updated map, circa 1994, taking place in Europe, the Middle East and North Africa.';
+	public $fullName   = 'Europa';
+	public $description= 'Europa takes place in Europe, the Middle East and North Africa.';
 	public $author     = 'Vincent Mous';
 	public $adapter    = 'Carey Jensen / Oliver Auth';
 	public $version    = 'II';

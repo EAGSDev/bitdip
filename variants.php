@@ -1,16 +1,11 @@
 <?php
 
 
-/**
-* @package Base
-* @subpackage Static
-*/
-
 require_once('header.php');
 
 libHTML::starthtml();
 
-print libHTML::pageTitle(l_t('webDiplomacy variants'),l_t('A list of the variants available on this server, with credits and information on variant-specific rules.'));
+print libHTML::pageTitle('Europa','Information on the game version played at BitDip.');
 
 $variantsOn=array();
 $variantsOff=array();
@@ -27,8 +22,7 @@ foreach($variants as $variantDir) {
    }
 }
 
-if( count($variantsOff) )
-   print '<a name="top"></a><h4>'.l_t('Active variants').'</h4>';
+
 
 print '<ul>';
 foreach( $variantsOn as $variantName )
@@ -41,18 +35,6 @@ foreach( $variantsOn as $variantName )
 }
 print '</ul>';
 
-if( count($variantsOff) )
-{
-   print '<h4>'.l_t('Disabled variants').'</h4>';
-   print '<p>'.l_t('Variants which are present but not activated.').'</p>';
-   print '<ul>';
-	foreach( $variantsOff as $variantName )
-	{
-	   $Variant = libVariant::loadFromVariantName($variantName);
-	   print '<li><a href="variants.php#'   . $Variant->name . '">' .l_t( $Variant->name ) . '</a> '.l_t('(%s Players)',count($Variant->countries)).'</li>';
-	}
-	print '</ul>';
-}
 
 libHTML::pagebreak();
 
