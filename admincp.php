@@ -7,6 +7,8 @@
 
 require_once('header.php');
 
+if (!$_SESSION['user_data']['AdminUser']) {die('line 10');}
+
 ini_set('memory_limit',"128M"); // 8M is the default
 ini_set('max_execution_time','240');
 

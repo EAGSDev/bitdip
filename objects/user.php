@@ -277,34 +277,38 @@ class User {
 		global $DBi;
 		global $aes_encrypt_key;
 
-		if (!is_numeric($userid)) {$userid=GUESTID;}
+		$fieldlist = ' ';
+		$fieldlist .= 'u.id, ';
+		$fieldlist .= 'u.username, ';
+		$fieldlist .= 'u.SecurityKey, ';
+		$fieldlist .= 'AES_DECRYPT(u.email,?) AS email, ';
+		$fieldlist .= 'u.type, ';
+		$fieldlist .= 'u.SystemUser, ';
+		$fieldlist .= 'u.GuestUser, ';
+		$fieldlist .= 'u.ModeratorUser, ';
+		$fieldlist .= 'u.AdminUser, ';
+		$fieldlist .= 'u.comment, ';
+		$fieldlist .= 'u.timeJoined, ';
+		$fieldlist .= 'u.timeLastSessionEnded, ';
+		$fieldlist .= 'u.points, ';
+		$fieldlist .= 'u.lastMessageIDViewed, ';
+		$fieldlist .= 'u.muteReports, ';
+		$fieldlist .= 'u.silenceID, ';
+		$fieldlist .= 'u.notifications, ';
+		$fieldlist .= 'IF(s.userID IS NULL,0,1) as online ';
 
-		$query = "SELECT
-			u.id,
-			u.username,
-			u.SecurityKey,
-			LOWER(HEX(u.password)) as password,
-			AES_DECRYPT(u.email,?) AS email,
-			u.type,
-			u.comment,
-			u.timeJoined,
-			u.timeLastSessionEnded,
-			u.points,
-			u.lastMessageIDViewed,
-			u.muteReports,
-			u.silenceID,
-			u.notifications,
-			IF(s.userID IS NULL,0,1) as online
-			FROM wD_Users u
-			LEFT JOIN wD_Sessions s ON ( u.id = s.userID )
-			WHERE u.id=?";
+		$whereclause = "WHERE u.id=? ";
+
+		$query = "SELECT ".$fieldlist." FROM wD_Users u	LEFT JOIN wD_Sessions s ON ( u.id = s.userID ) ".$whereclause;
+
+
 		$row=$DBi->fetch_row("$query",false,array($aes_encrypt_key,$userid));
 
-		if ( ! isset($row['id']) or ! $row['id'] )
-		{
-			$_SESSION['user_data']['id']=GUESTID;
-			throw new Exception(l_t("A user object has been created which doesn't represent a real user."));
-		}
+		if (!$row){// this is a guest user
+			$whereclause = "WHERE u.GuestUser=1";
+			$query = "SELECT ".$fieldlist." FROM wD_Users u	LEFT JOIN wD_Sessions s ON ( u.id = s.userID ) ".$whereclause;
+			$row=$DBi->fetch_row("$query",false,array($aes_encrypt_key,$userid));
+		}// end if if (!$row)
 
 		foreach( $row as $name=>$value )
 		{
@@ -317,23 +321,26 @@ class User {
 
 		}
 
+		###############################################################
+		##############################################################
 		// Convert an array of types this user has into an array of true/false indexed by type
-		$this->type = explode(',', $this->type);
-		$validTypes = array('System','Banned','User','Moderator','Guest','Admin','Donator','DonatorBronze','DonatorSilver','DonatorGold','DonatorPlatinum','ForumModerator');
+		// eventually this can be removed when type becomes a single value instead of an array -- jimbursch
+
 		$types = array();
-		foreach($validTypes as $type)
-		{
-			if ( in_array($type, $this->type) )
-			{
-				$types[$type] = true;
-			}
-			else
-			{
-				$types[$type] = false;
-			}
-		}
+
+		$types['System'] = false;
+		$types['Guest'] = false;
+		$types['User'] = true;
+		$types['Moderator'] = false;
+		$types['Admin'] = false;
+
+
+
+		if ($_SESSION['user_data']['AdminUser']) {$types['Admin'] = true;$types['Moderator'] = true;}
+		if ($_SESSION['user_data']['GuestUser']) {$types['Guest'] = true;$types['User'] = false;}
+		if ($_SESSION['user_data']['SystemUser']) {$types['System'] = true;$types['User'] = false;}
+
 		$this->type = $types;
-		if ($authentication) {$_SESSION['user_data']['type']=$types;}
 
 		$this->notifications=new setUserNotifications($this->notifications);
 
