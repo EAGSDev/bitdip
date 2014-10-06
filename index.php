@@ -6,7 +6,7 @@ require_once(l_r('lib/message.php'));
 require_once(l_r('objects/game.php'));
 require_once(l_r('gamepanel/gamehome.php'));
 
-libHTML::starthtml(l_t('Home'));
+libHTML::starthtml('Home');
 
 if( !isset($_SESSION['lastSeenHome']) || $_SESSION['lastSeenHome'] < $User->timeLastSessionEnded ) {
 	$_SESSION['lastSeenHome']=$User->timeLastSessionEnded;
@@ -193,17 +193,9 @@ class libHome {
 		if($count==0)
 		{
 			$buf .= '<div class="hr"></div>';
-			$buf .= '<div><p class="notice">'.l_t('You\'re not joined to any games!').'<br />
-				'.l_t('Access the <a href="gamelistings.php?tab=">Games</a> '.
-				'link above to find games you can join, or start a '.
-				'<a href="gamecreate.php">New game</a> yourself.</a>').'</p></div>';
+			$buf .= '<div><p class="notice">You\'re not joined to any games!<br /> Access the <a href="gamelistings.php?tab=">Games</a> link above to find games you can join.</p></div>';
 		}
-		elseif ( $count == 1 && $User->points > 5 )
-		{
-			$buf .= '<div class="hr"></div>';
-			$buf .= '<div><p class="notice">'.l_t('You can join as many games as you '.
-			'have the points to join.').' </a></p></div>';
-		}
+
 		return $buf;
 	}// end static public function gameNotifyBlock ()
 
@@ -328,9 +320,9 @@ class libHome {
 
 }// end class libHome
 
-if( !$User->type['User'] )
+if($_SESSION['user_data']['GuestUser'])
 {
-	print libHTML::pageTitle(l_t('Welcome to BitDip'),l_t('A game of grand strategy played for bitcoin.'));
+	print libHTML::pageTitle('Welcome to BitDip','A game of grand strategy played for bitcoin.');
 	//print '<div class="content">';
 
 	print '<p class="welcome">';
@@ -406,42 +398,50 @@ else
 	*/
 	print '<div class="content-bare content-home-header">';// content-follow-on">';
 
-	print '<table class="homeTable"><tr>';
+	print '<table class="homeTable">';
 
-	print '<td class="homeMessages">';
+	#######################################
+	// games
+	print '<tr><td class="homeGamesStats">';
+	print '<div class="pageTitle"><a href="gamelistings.php?page=1&gamelistType=My games">Games</a></div>';
+	print libHome::gameNotifyBlock();
+	print '</td></tr>';
 
-	print '<div class="homeHeader">'.l_t('Forum').' <a href="forum.php">'.libHTML::link().'</a></div>';
+	#######################################
+	// forum
+	print '<tr><td class="homeMessages">';
+	print '<div class="pageTitle"><a href="forum.php">Forum</a></div>';
 	if( file_exists(libCache::dirName('forum').'/home-forum.html') )
 		print file_get_contents(libCache::dirName('forum').'/home-forum.html');
-	else
-	{
+	else {
 		$buf_home_forum=libHome::forumNew();
 		file_put_contents(libCache::dirName('forum').'/home-forum.html', $buf_home_forum);
 		print $buf_home_forum;
 	}
-	print '</td>';
+	print '</td></tr>';
 
-	print '<td class="homeSplit"></td>';
-
-	print '<td class="homeGameNotices">';
-
-	/*$buf = libHome::PMs();
-	if(strlen($buf))
-		print '<div class="homeHeader">Private messages</div>'.$buf;
-	*/
-
-	print '<div class="homeHeader">'.l_t('Notices').' <a href="index.php?notices=on">'.libHTML::link().'</a></div>';
+	#######################################
+	// notices
+	print '<tr><td class="homeGameNotices">';
+	print '<div class="pageTitle"><a href="index.php?notices=on">Notices</a></div>';
 	print libHome::Notice();
-	print '</td>';
+	print '</td></tr>';
 
-	print '<td class="homeSplit"></td>';
+	#######################################
+	// account
+	print '<tr><td class="homeGameNotices">';
+	print '<div class="pageTitle"><a href="./account.php">Account</a></div>';
+	print '</td></tr>';
 
-	print '<td class="homeGamesStats">';
-	print '<div class="homeHeader">'.l_t('My games').' <a href="gamelistings.php?page=1&gamelistType=My games">'.libHTML::link().'</a></div>';
-	print libHome::gameNotifyBlock();
+	#######################################
+	// admin
+	if ($_SESSION['user_data']['AdminUser']) {
+	print '<tr><td class="homeGameNotices">';
+	print '<div class="pageTitle"><a href="./admincp.php">BitDip Admin</a></div>';
+	print '</td></tr>';
+	}
 
-	print '</td>
-	</tr></table>';
+	print '</table>';
 
 	print '</div>';
 	print '</div>';

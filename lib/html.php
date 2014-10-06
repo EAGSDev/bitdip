@@ -7,21 +7,20 @@
  * A collection of functions which output HTML and manage the main body and layout of the menu,
  * notification bar, and content.
  *
- * @package Base
  */
 class libHTML
 {
+
+	###################################################
+	// makes the bar for page title;
 	public static function pageTitle($title, $description=false) {
 		return '<div class="content-bare content-board-header content-title-header">
-<div class="pageTitle barAlt1">
-	'.$title.'
-</div>
-<div class="pageDescription barAlt2">
-	'.$description.'
-</div>
-</div>
-<div class="content content-follow-on">';
-	}
+					<div class="pageTitle">'.$title.'</div>
+					<!-- <div class="pageDescription barAlt2">'.$description.'</div> -->
+				</div>
+		<div class="content content-follow-on">';
+	}// end public static function pageTitle($title, $description=false)
+	######################################################
 
 	/**
 	 * The style which prevents an element from displaying (usually cached HTML to be displayed via JS)
@@ -48,25 +47,6 @@ class libHTML
 			l_t('Online').'" title="'.l_t('User currently logged on').'" />';
 	}
 
-	static function platinum()
-	{
-		return ' <img src="'.l_s('images/icons/platinum.png').'" alt="(P)" title="'.l_t('Donator - platinum').'" />';
-	}
-
-	static function gold()
-	{
-		return ' <img src="'.l_s('images/icons/gold.png').'" alt="(G)" title="'.l_t('Donator - gold').'" />';
-	}
-
-	static function silver()
-	{
-		return ' <img src="'.l_s('images/icons/silver.png').'" alt="(S)" title="'.l_t('Donator - silver').'" />';
-	}
-
-	static function bronze()
-	{
-		return ' <img src="'.l_s('images/icons/bronze.png').'" alt="(B)" title="'.l_t('Donator - bronze').'" />';
-	}
 
 	/**
 	 * The points icon
@@ -327,7 +307,7 @@ class libHTML
 
 		if ( !isset($Misc) )
 		{
-			die('<html><head><title>'.l_t('webDiplomacy fatal error').'</title></head>
+			die('<html><head><title>'.l_t('fatal error').'</title></head>
 				<body><p>'.l_t('Error occurred during script startup, usually a result of inability to connect to the database:').'</p>
 				<p>'.$message.'</p></body></html>');
 		}
@@ -408,19 +388,6 @@ class libHTML
 		print libHTML::prebody($title===FALSE ? l_t($pages[$scriptname]['name']) : $title).
 			'<body>'.libHTML::menu($pages, $scriptname);
 
-		if( defined('FACEBOOKSCRIPT') ) {
-			?>
-			<script src="http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php/en_US" type="text/javascript"></script>
-			<script type="text/javascript">
-			FB.init("b24f8dc93cdbf2ff1ee7db508ae14c6d");
-			FB_RequireFeatures(["CanvasUtil"], function(){
-				FB.XdComm.Server.init("xd_receiver.htm");
-				FB.CanvasClient.startTimerToSizeToContent();
-			});
-			</script>
-			<div id="FB_HiddenIFrameContainer" style="display:none; position:absolute; left:-100px; top:-100px; width:0px; height: 0px;"></div>
-			<?php
-		}
 
 		print '<noscript><div class="content-notice">
 					<p class="notice">'.l_t('You do not have JavaScript enabled. It is required to use webDiplomacy fully.').'</p>
@@ -466,7 +433,7 @@ class libHTML
 		if ( $Misc->Notice )
 			$notice[] = Config::$serverMessages['Notice'];
 
-		if ( ( time() - $Misc->LastProcessTime ) > Config::$downtimeTriggerMinutes*60 )
+		if ( ( time() - $Misc->LastProcessTime ) > Config::$downtimeTriggerMinutes*60 && !$_SESSION['user_data']['GuestUser'])
 			$notice[] = l_t("The last process time was over %s minutes ".
 				"ago (at %s); the server ".
 				"is not processing games until the cause is found and games are given extra time.",
@@ -546,18 +513,10 @@ class libHTML
 		return $gameNotifyBlock;
 	}
 
-	/**
-	 * Return an array of links, along with their names, who can view them, and
-	 * whether they appear in the menu.
-	 *
-	 * @return array
-	 */
-	static public function pages ()
-	{
-		global $User;
+	###########################################################
+	// Return an array of links, along with their names,and whether they appear in the menu.
 
-		$allUsers = array('Guest','User','Moderator','Admin');
-		$loggedOnUsers = array('User','Moderator','Admin');
+	static public function pages ()	{
 
 		$links=array();
 
@@ -565,21 +524,10 @@ class libHTML
 		$links['index.php']=array('name'=>'Home', 'inmenu'=>TRUE, 'title'=>"See what's happening");
 		$links['forum.php']=array('name'=>'Forum', 'inmenu'=>TRUE, 'title'=>"The forum; chat, get help, help others, arrange games, discuss strategies");
 		$links['gamelistings.php']=array('name'=>'Games', 'inmenu'=>TRUE, 'title'=>"Game listings; a searchable list of the games on this server");
-
-		if (is_object($User))
-		{
-			if( !$User->type['User'] )
-			{
-				$links['logon.php']=array('name'=>'Log on', 'inmenu'=>false, 'title'=>"Log onto webDiplomacy using an existing user account");
-				$links['register.php']=array('name'=>'Register', 'inmenu'=>TRUE, 'title'=>"Make a new user account");
-			}
-			else
-			{
-				$links['logon.php']=array('name'=>'Log off', 'inmenu'=>false, 'title'=>"Log onto webDiplomacy using an existing user account");
-
-				$links['account.php']=array('name'=>'Account', 'inmenu'=>TRUE, 'title'=>"Change your account settings");
-			}
-		}
+		$links['logon.php']=array('name'=>'Log on', 'inmenu'=>false, 'title'=>"Log onto webDiplomacy using an existing user account");
+		$links['register.php']=array('name'=>'Register', 'inmenu'=>TRUE, 'title'=>"Make a new user account");
+		$links['logon.php']=array('name'=>'Log off', 'inmenu'=>false, 'title'=>"Log onto webDiplomacy using an existing user account");
+		$links['account.php']=array('name'=>'Account', 'inmenu'=>TRUE, 'title'=>"Change your account settings");
 		$links['help.php']=array('name'=>'Help', 'inmenu'=>TRUE, 'title'=>'Get help and information; guides, intros, FAQs, stats, links');
 
 		// Items not displayed on the menu
@@ -597,21 +545,10 @@ class libHTML
 		$links['datc.php']=array('name'=>'DATC', 'inmenu'=>FALSE);
 		$links['variants.php']=array('name'=>'Variants', 'inmenu'=>FALSE);
 
-		if ( is_object($User) )
-		{
-			if ( $User->type['Admin'] or $User->type['Moderator'] )
-				$links['gamecreate.php']=array('name'=>'New game', 'inmenu'=>TRUE, 'title'=>"Start up a new game");
-				$links['admincp.php']=array('name'=>'Admin CP', 'inmenu'=>true);
-
-			$links['gamemaster.php']=array('name'=>'GameMaster', 'inmenu'=>FALSE);
-		}
-
-		if ( defined('FACEBOOKSCRIPT') )
-		{
-			$links['invite.php']=array('name'=>'Invite', 'inmenu'=>TRUE);
-			$links['logon.php']['inmenu']=false;
-			$links['register.php']['inmenu']=false;
-		}
+		// admin links
+		$links['gamecreate.php']=array('name'=>'New game', 'inmenu'=>TRUE, 'title'=>"Start up a new game");
+		$links['admincp.php']=array('name'=>'Admin CP', 'inmenu'=>true);
+		$links['gamemaster.php']=array('name'=>'GameMaster', 'inmenu'=>FALSE);
 
 		return $links;
 	}
@@ -626,70 +563,37 @@ class libHTML
 	 */
 	static public function menu ($pages, $scriptname)
 	{
-		global $User;
+		$menu = '';
+	 	$menu .= '<!-- Menu begin. -->';
+		$menu .= '<div id="header">';
+			$menu .= '<div id="header-container">';
+				$menu .= '<a href="./"><img id="logo" src="images/logo.png" alt="BitDip" /></a>';
 
-	 	$menu = '<!-- Menu begin. -->
-				<div id="header">
-					<div id="header-container">
-						<a href="./">
-							<img id="logo" src="'.l_s('images/logo.png').'" alt="'.l_t('webDiplomacy').'" />
-						</a>';
 
-		if ( is_object( $User ) )
-		{
-			if ( ! $pages[$scriptname]['inmenu'] )
-				$arguments = str_replace('&', '&amp;', $_SERVER['QUERY_STRING']);
-			else
-				$arguments = '';
+				$menu .= '<div style="float:right; text-align:right; width:100%">';
 
-			$menu .= '
-				<div style="float:right; text-align:right; width:100%">
-					<div id="header-welcome">
-						'.(is_object($User)?l_t('Welcome, %s',$User->profile_link(TRUE)).' -
-						<span class="logon">('.
-							($User->type['User'] ?
-							'<a href="logon.php?logoff=on" class="light">'.l_t('Log off').'</a>)'.
-								( defined('AdminUserSwitch') ? ' (<a href="index.php?auid=0" class="light">'.l_t('Switch back').'</a>)' : '' )
-							:'<a href="logon.php" class="light">'.l_t('Log on').'</a>)').
-						'</span>'
-						:l_t('Welcome, Guest')).'
-					</div>';
+					if (!$_SESSION['user_data']['GuestUser']) {
+					$menu .= '<div id="header-welcome">';
+					$menu .= 'Welcome, <a href="./profile.php?userID='.$_SESSION['user_data']['id'].'">'.$_SESSION['user_data']['username'].'</a> -';
+					$menu .= '<span class="logon">(';
+					$menu .= '<a href="logon.php?logoff=on" class="light">Log off</a>)';
+					$menu .= '</span>';
+					$menu .= '</div>';
+					}// end if (!$_SESSION['user_data']['GuestUser'])
 
-			$menu .= '<div id="header-goto">';
+					else {
+					$menu .= '<div id="header-goto">';
+					$menu .= '<a href="./register.php">Register</a> <a href="./logon.php">Log on</a>';
+					$menu .= '</div>';
+					}// end else
 
-			if( isset($pages[$scriptname]) and ! $pages[$scriptname]['inmenu'] )
-			{
-				$menu .= '<a href="'.$scriptname.'?'.$arguments.'" title="'.l_t('The current page; click to refresh').'" class="current">'
-					.l_t($pages[$scriptname]['name']).'</a>';
-			}
+				$menu .= '</div><!-- end <div style="float:right; text-align:right; width:100%">  -->'; // end
+			$menu .= '</div><!-- end <div id="header-container">  -->';
+		$menu .= '</div><!-- end <div id="header">  -->';
 
-			foreach($pages as $page=>$script)
-			{
-				if($script['inmenu'])
-				{
-					$menu .= '<a href="'.$page.
-						( $page==$scriptname ? '?'.$arguments.'" class="current"' : '"').' '.
-						( isset($script['title']) ? 'title="'.l_t($script['title']).'"' :'').' '.
-						'>'.
-						l_t($script['name']).'</a>';
-				}
-			}
-
-			$menu .= '</div></div>';
-		}
-		else
-		{
-			$menu .= '<div id="header-welcome">&nbsp;</div>
-				<div id="header-goto">
-					<a href="index.php">'.l_t('Home').'</a>
-					<a href="'.$scriptname.'">'.l_t('Reload current page').'</a>
-				</div>';
-		}
-		$menu .= '</div>
-		</div>
-		<div id="seperator"></div>
-		<div id="seperator-fixed"></div>
-		<!-- Menu end. -->';
+		$menu .= '<div id="seperator"></div>';
+		$menu .= '<div id="seperator-fixed"></div>';
+		$menu .= '<!-- Menu end. -->';
 
 		return $menu;
 	}
